@@ -1,0 +1,68 @@
+{% extends "taller/base.html" %}
+{% block title %}Invitar Técnico{% endblock %}
+{% block page_title %}Equipo del taller{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-5">
+    <div class="form-card p-4">
+      <h6 class="fw-semibold mb-3">Invitar técnico por email</h6>
+      <p class="text-muted small mb-3">Le llegará un email con un link para crear su cuenta y unirse a tu taller.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Email del técnico</label>
+          {{ form.email }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Rol</label>
+          {{ form.rol }}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-envelope me-1"></i> Enviar invitación
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="table-card">
+      <div class="p-3 border-bottom">
+        <h6 class="mb-0 fw-semibold">Invitaciones enviadas</h6>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Enviada</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inv in invitaciones %}
+            <tr>
+              <td class="small">{{ inv.email }}</td>
+              <td><span class="badge bg-light text-dark">{{ inv.get_rol_display }}</span></td>
+              <td>
+                {% if inv.usada %}
+                <span class="badge bg-success">Aceptada</span>
+                {% elif inv.vigente %}
+                <span class="badge bg-warning text-dark">Pendiente</span>
+                {% else %}
+                <span class="badge bg-secondary">Expirada</span>
+                {% endif %}
+              </td>
+              <td class="small text-muted">{{ inv.creada_en|date:"d/m/Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-4">No has enviado invitaciones aún.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

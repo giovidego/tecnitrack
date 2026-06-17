@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguimiento de reparación - {{ taller.nombre }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root { --primary: #4f46e5; }
+    body { background: #f8f7ff; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .topbar-pub { background: white; border-bottom: 1px solid #e5e7eb; padding: 0.875rem 1.5rem; }
+    .topbar-pub .brand { font-size: 1rem; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 0.5rem; }
+    .topbar-pub .brand-icon { width: 28px; height: 28px; background: var(--primary); border-radius: 7px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem; }
+    .main { max-width: 680px; margin: 0 auto; padding: 2rem 1rem; }
+
+    /* Tarjeta principal */
+    .orden-card { background: white; border-radius: 16px; padding: 1.75rem; border: 1px solid #e5e7eb; margin-bottom: 1.25rem; }
+    .orden-numero { font-size: 0.85rem; color: #6b7280; }
+    .orden-equipo { font-size: 1.3rem; font-weight: 700; color: #111827; margin: 0.25rem 0; }
+
+    /* Estado grande */
+    .estado-hero { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-radius: 12px; margin: 1.25rem 0; }
+    .estado-hero .estado-icono { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+    .estado-hero .estado-texto { font-size: 1.15rem; font-weight: 700; }
+    .estado-hero .estado-sub { font-size: 0.85rem; margin-top: 0.2rem; }
+
+    /* Colores por estado */
+    .s-recibido { background: #f3f4f6; } .s-recibido .estado-icono { background: #e5e7eb; color: #374151; }
+    .s-diagnostico { background: #eff6ff; } .s-diagnostico .estado-icono { background: #dbeafe; color: #1d4ed8; }
+    .s-espera_repuestos { background: #fffbeb; } .s-espera_repuestos .estado-icono { background: #fde68a; color: #92400e; }
+    .s-en_reparacion { background: #eef2ff; } .s-en_reparacion .estado-icono { background: #e0e7ff; color: #4338ca; }
+    .s-listo { background: #f0fdf4; } .s-listo .estado-icono { background: #bbf7d0; color: #166534; }
+    .s-entregado { background: #f9fafb; } .s-entregado .estado-icono { background: #e5e7eb; color: #374151; }
+    .s-cancelado { background: #fef2f2; } .s-cancelado .estado-icono { background: #fecaca; color: #991b1b; }
+
+    /* Stepper visual */
+    .stepper { display: flex; align-items: center; margin: 1.5rem 0; }
+    .step { flex: 1; text-align: center; position: relative; }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.35rem; font-size: 0.75rem; color: #9ca3af; border: 2px solid #e5e7eb; }
+    .step.done .step-dot { background: var(--primary); border-color: var(--primary); color: white; }
+    .step.active .step-dot { background: white; border-color: var(--primary); color: var(--primary); font-weight: 700; box-shadow: 0 0 0 4px rgba(79,70,229,0.15); }
+    .step-label { font-size: 0.65rem; color: #9ca3af; }
+    .step.done .step-label, .step.active .step-label { color: #374151; }
+    .step-line { position: absolute; top: 13px; left: 50%; right: -50%; height: 2px; background: #e5e7eb; z-index: 0; }
+    .step.done .step-line { background: var(--primary); }
+    .step:last-child .step-line { display: none; }
+
+    /* Timeline historial */
+    .historial { }
+    .historial-item { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
+    .historial-item:last-child { border-bottom: none; }
+    .historial-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); flex-shrink: 0; margin-top: 0.35rem; }
+    .historial-info { flex: 1; }
+    .historial-estado { font-weight: 600; font-size: 0.9rem; }
+    .historial-comment { font-size: 0.85rem; color: #374151; margin-top: 0.2rem; }
+    .historial-fecha { font-size: 0.75rem; color: #9ca3af; }
+
+    /* Footer taller */
+    .taller-footer { text-align: center; margin-top: 2rem; color: #9ca3af; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+
+<div class="topbar-pub d-flex align-items-center justify-content-between">
+  <div class="brand">
+    <div class="brand-icon"><i class="bi bi-tools"></i></div>
+    {{ taller.nombre }}
+  </div>
+  <span class="text-muted small">Seguimiento de reparación</span>
+</div>
+
+<div class="main">
+
+  <!-- Tarjeta principal -->
+  <div class="orden-card">
+    <div class="orden-numero">Orden {{ orden.numero }}</div>
+    <div class="orden-equipo">{{ orden.equipo.get_tipo_display }} {{ orden.equipo.marca }} {{ orden.equipo.modelo }}</div>
+    <div class="text-muted small">
+      Ingresado el {{ orden.fecha_ingreso|date:"d \d\e F \d\e Y" }}
+      {% if orden.fecha_estimada %} · Entrega estimada: {{ orden.fecha_estimada|date:"d/m/Y" }}{% endif %}
+    </div>
+
+    <!-- Estado actual destacado -->
+    {% with estado=orden.estado %}
+    <div class="estado-hero s-{{ estado }}">
+      <div class="estado-icono">
+        {% if estado == 'recibido' %}<i class="bi bi-inbox"></i>
+        {% elif estado == 'diagnostico' %}<i class="bi bi-search"></i>
+        {% elif estado == 'espera_repuestos' %}<i class="bi bi-hourglass-split"></i>
+        {% elif estado == 'en_reparacion' %}<i class="bi bi-tools"></i>
+        {% elif estado == 'listo' %}<i class="bi bi-check-circle-fill"></i>
+        {% elif estado == 'entregado' %}<i class="bi bi-bag-check"></i>
+        {% elif estado == 'cancelado' %}<i class="bi bi-x-circle"></i>
+        {% endif %}
+      </div>
+      <div>
+        <div class="estado-texto">{{ orden.get_estado_display }}</div>
+        <div class="estado-sub text-muted">
+          {% if estado == 'recibido' %}Hemos recibido tu equipo. Pronto comenzamos el diagnóstico.
+          {% elif estado == 'diagnostico' %}Nuestro técnico está revisando tu equipo.
+          {% elif estado == 'espera_repuestos' %}Tu equipo necesita repuestos. Te avisaremos cuando lleguen.
+          {% elif estado == 'en_reparacion' %}Ya comenzamos a reparar tu equipo. ¡Casi listo!
+          {% elif estado == 'listo' %}¡Tu equipo está listo! Puedes venir a retirarlo.
+          {% elif estado == 'entregado' %}Equipo entregado. ¡Gracias por confiar en nosotros!
+          {% elif estado == 'cancelado' %}La orden fue cancelada. Contáctanos para más información.
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endwith %}
+
+    <!-- Stepper visual -->
+    {% with estado=orden.estado %}
+    <div class="stepper">
+      <div class="step {% if estado == 'recibido' %}active{% elif estado != 'recibido' %}done{% endif %}">
+        <div class="step-line"></div>
+        <div class="step-dot"><i class="bi bi-inbox"></i></div>
+        <div class="step-label">Recibido</div>
+      </div>
+      <div class="step {% if estado == 'diagnostico' %}active{% elif estado in 'en_reparacion,espera_repuestos,listo,entregado' %}done{% endif %}">
+        <div class="step-line"></div>
+        <div class="step-dot"><i class="bi bi-search"></i></div>
+        <div class="step-label">Diagnóstico</div>
+      </div>
+      <div class="step {% if estado == 'en_reparacion' or estado == 'espera_repuestos' %}active{% elif estado in 'listo,entregado' %}done{% endif %}">
+        <div class="step-line"></div>
+        <div class="step-dot"><i class="bi bi-tools"></i></div>
+        <div class="step-label">Reparación</div>
+      </div>
+      <div class="step {% if estado == 'listo' %}active{% elif estado == 'entregado' %}done{% endif %}">
+        <div class="step-line"></div>
+        <div class="step-dot"><i class="bi bi-check-lg"></i></div>
+        <div class="step-label">Listo</div>
+      </div>
+      <div class="step {% if estado == 'entregado' %}done{% endif %}">
+        <div class="step-dot"><i class="bi bi-bag-check"></i></div>
+        <div class="step-label">Entregado</div>
+      </div>
+    </div>
+    {% endwith %}
+
+  </div>
+
+  <!-- Historial de estados -->
+  {% if historial %}
+  <div class="orden-card">
+    <h6 class="fw-semibold mb-3">Historial de actualizaciones</h6>
+    <div class="historial">
+      {% for h in historial reversed %}
+      <div class="historial-item">
+        <div class="historial-dot"></div>
+        <div class="historial-info">
+          <div class="historial-estado">{{ h.get_estado_nuevo_display|default:h.estado_nuevo }}</div>
+          {% if h.comentario %}<div class="historial-comment">{{ h.comentario }}</div>{% endif %}
+          <div class="historial-fecha">{{ h.creado_en|date:"d/m/Y H:i" }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Contacto taller -->
+  <div class="orden-card">
+    <h6 class="fw-semibold mb-2">¿Tienes preguntas?</h6>
+    <div class="text-muted small">
+      Contáctanos directamente:
+    </div>
+    <div class="mt-2">
+      {% if taller.telefono %}
+      <a href="tel:{{ taller.telefono }}" class="btn btn-outline-success btn-sm me-2">
+        <i class="bi bi-telephone me-1"></i>{{ taller.telefono }}
+      </a>
+      {% endif %}
+      {% if taller.email %}
+      <a href="mailto:{{ taller.email }}" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-envelope me-1"></i>Enviar email
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="taller-footer">
+    <strong>{{ taller.nombre }}</strong>{% if taller.direccion %} · {{ taller.direccion }}{% endif %}<br>
+    Powered by <strong>TecniTrack</strong>
+  </div>
+
+</div>
+</body>
+</html>

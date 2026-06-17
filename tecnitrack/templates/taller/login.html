@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingresar - TecniTrack</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    body { background: #f0f0ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .login-card { background: white; border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(79,70,229,0.10); border: 1px solid #e5e7eb; }
+    .brand { text-align: center; margin-bottom: 2rem; }
+    .brand-icon { width: 52px; height: 52px; background: #4f46e5; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; margin-bottom: 0.75rem; }
+    .brand h1 { font-size: 1.5rem; font-weight: 700; color: #111827; margin: 0; }
+    .brand p { color: #6b7280; font-size: 0.875rem; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-icon"><i class="bi bi-tools"></i></div>
+      <h1>TecniTrack</h1>
+      <p>Gestión de servicio técnico</p>
+    </div>
+
+    {% if messages %}
+    {% for msg in messages %}
+    <div class="alert alert-danger py-2 small">{{ msg }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label fw-medium">Usuario</label>
+        {{ form.username }}
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-medium">Contraseña</label>
+        {{ form.password }}
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+        Ingresar
+      </button>
+    </form>
+  </div>
+</body>
+</html>

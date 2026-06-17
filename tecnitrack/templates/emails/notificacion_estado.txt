@@ -1,0 +1,22 @@
+{{ taller.nombre }} - Actualización de reparación
+==============================================
+
+Hola {{ orden.cliente.nombre }},
+
+{{ mensaje_corto }}
+
+Estado actual: {{ estado_display }}
+Equipo: {{ orden.equipo.marca }} {{ orden.equipo.modelo }}
+N° Orden: {{ orden.numero }}
+{% if orden.fecha_estimada %}Entrega estimada: {{ orden.fecha_estimada|date:"d/m/Y" }}
+{% endif %}
+Sigue el estado de tu reparación aquí:
+{{ url_seguimiento }}
+
+Contacto:
+{% if taller.telefono %}Teléfono: {{ taller.telefono }}
+{% endif %}{% if taller.email %}Email: {{ taller.email }}
+{% endif %}{% if taller.direccion %}Dirección: {{ taller.direccion }}
+{% endif %}
+--
+Este correo fue enviado automáticamente por TecniTrack.

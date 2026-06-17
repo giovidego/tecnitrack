@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8">
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; margin: 0; padding: 20px; }
+  .c { max-width: 540px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; }
+  .h { background: linear-gradient(135deg, #1e1b4b, #4338ca); padding: 28px; color: white; text-align: center; }
+  .emoji { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+  .h h1 { font-size: 1.3rem; margin: 0 0 4px; }
+  .h p { color: rgba(255,255,255,0.7); margin: 0; font-size: 0.875rem; }
+  .b { padding: 28px; }
+  .trial-box { background: #eef2ff; border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; border-left: 4px solid #4f46e5; }
+  .btn { display: block; background: #4f46e5; color: white !important; text-decoration: none; padding: 14px 24px; border-radius: 10px; text-align: center; font-weight: 700; margin: 20px 0; }
+  .step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; font-size: 0.9rem; }
+  .step-num { width: 24px; height: 24px; background: #4f46e5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+  .footer { background: #f9fafb; padding: 16px 28px; text-align: center; font-size: 0.75rem; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+<div class="c">
+  <div class="h">
+    <span class="emoji">🎉</span>
+    <h1>¡Bienvenido a TecniTrack, {{ usuario.first_name }}!</h1>
+    <p>{{ taller.nombre }} está listo</p>
+  </div>
+  <div class="b">
+    <div class="trial-box">
+      <strong>Tu período de prueba de 30 días ha comenzado.</strong><br>
+      <span style="font-size:0.85rem; color:#374151;">Sin cobros. Sin compromisos. Cancela cuando quieras.</span>
+    </div>
+
+    <p>Estos son tus primeros pasos:</p>
+    <div class="step"><div class="step-num">1</div><div><strong>Crea tu primer cliente</strong><br><span style="color:#6b7280;font-size:0.85rem;">Ve a Clientes → Nuevo Cliente</span></div></div>
+    <div class="step"><div class="step-num">2</div><div><strong>Crea una orden de reparación</strong><br><span style="color:#6b7280;font-size:0.85rem;">Con el equipo y el problema del cliente</span></div></div>
+    <div class="step"><div class="step-num">3</div><div><strong>Comparte el link de seguimiento</strong><br><span style="color:#6b7280;font-size:0.85rem;">El cliente verá el estado sin llamarte</span></div></div>
+    <div class="step"><div class="step-num">4</div><div><strong>Invita a tus técnicos</strong><br><span style="color:#6b7280;font-size:0.85rem;">Desde Equipo → Invitar técnico</span></div></div>
+
+    <a href="{{ site_url }}/dashboard/" class="btn">Ir a mi panel →</a>
+
+    <p style="font-size:0.85rem; color:#6b7280;">¿Tienes preguntas? Responde este email y te ayudamos.</p>
+  </div>
+  <div class="footer">TecniTrack · {{ taller.nombre }} · {{ site_url }}</div>
+</div>
+</body>
+</html>

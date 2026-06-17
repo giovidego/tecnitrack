@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suscripción vencida — TecniTrack</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f7ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', system-ui, sans-serif; padding: 2rem; }
+    .card-wrap { background: white; border-radius: 20px; padding: 3rem 2.5rem; max-width: 680px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+    .price-card { border: 1.5px solid #e5e7eb; border-radius: 14px; padding: 1.5rem; height: 100%; }
+    .price-card.featured { border-color: #4f46e5; background: #fafafe; }
+    .price-amount { font-size: 2rem; font-weight: 800; }
+    .feature { display: flex; gap: 0.5rem; font-size: 0.875rem; margin-bottom: 0.5rem; }
+    .feature i { color: #10b981; flex-shrink: 0; margin-top: 2px; }
+  </style>
+</head>
+<body>
+<div class="card-wrap">
+  <div class="text-center mb-4">
+    <div style="font-size:3rem;">⏰</div>
+    <h2 class="fw-bold mt-2">Tu período de prueba ha terminado</h2>
+    <p class="text-muted">Elige un plan para seguir usando TecniTrack y mantener todos tus datos.</p>
+  </div>
+
+  <div class="row g-3 mb-4">
+    {% for plan_key, plan in planes.items %}
+    <div class="col-md-4">
+      <div class="price-card {% if plan_key == 'profesional' %}featured{% endif %}">
+        {% if plan_key == 'profesional' %}<div class="badge bg-primary mb-2">Recomendado</div>{% endif %}
+        <div class="fw-bold mb-1">{{ plan.nombre }}</div>
+        <div class="price-amount">${{ plan.precio|floatformat:0 }}</div>
+        <div class="text-muted small mb-3">CLP / mes</div>
+        <div class="feature"><i class="bi bi-check-circle-fill"></i>
+          {% if plan.max_tecnicos %}{{ plan.max_tecnicos }} técnicos{% else %}Ilimitados{% endif %}
+        </div>
+        <div class="feature"><i class="bi bi-check-circle-fill"></i>
+          {% if plan.max_ordenes_mes %}{{ plan.max_ordenes_mes }} órdenes/mes{% else %}Ilimitadas{% endif %}
+        </div>
+        <div class="feature"><i class="bi bi-check-circle-fill"></i>Link seguimiento</div>
+        <div class="feature"><i class="bi bi-check-circle-fill"></i>Notificaciones</div>
+        <a href="mailto:hola@tecnitrack.cl?subject=Contratar plan {{ plan.nombre }} - {{ taller.nombre }}"
+           class="btn {% if plan_key == 'profesional' %}btn-primary{% else %}btn-outline-primary{% endif %} w-100 mt-3 btn-sm">
+          Contratar {{ plan.nombre }}
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center">
+    <p class="text-muted small">¿Necesitas ayuda para elegir? Escríbenos a <a href="mailto:hola@tecnitrack.cl">hola@tecnitrack.cl</a></p>
+    <a href="{% url 'logout' %}" class="text-muted small">Cerrar sesión</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+{% extends "taller/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'crear_orden' %}" class="btn btn-primary btn-sm">
+  <i class="bi bi-plus-lg me-1"></i> Nueva Orden
+</a>
+{% endblock %}
+
+{% block content %}
+
+{% if taller.suscripcion.estado == 'trial' %}
+<div class="alert alert-info border-0 d-flex align-items-center gap-3 mb-3" style="background:#eef2ff;">
+  <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+  <div>
+    <strong>Período de prueba activo</strong> — Te quedan
+    <strong>{{ taller.suscripcion.dias_trial_restantes }} días</strong> gratis.
+    <a href="{% url 'ver_planes' %}" class="ms-2 text-primary fw-semibold">Ver planes →</a>
+  </div>
+</div>
+{% endif %}
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-primary">{{ stats.total_activas }}</div>
+      <div class="stat-label">Órdenes activas</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-success">{{ stats.listas_retirar }}</div>
+      <div class="stat-label">Listas para retirar</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-info">{{ stats.recibidas_hoy }}</div>
+      <div class="stat-label">Ingresadas hoy</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number {% if stats.urgentes > 0 %}text-danger{% else %}text-secondary{% endif %}">{{ stats.urgentes }}</div>
+      <div class="stat-label">Urgentes</div>
+    </div>
+  </div>
+</div>
+
+<!-- Órdenes recientes -->
+<div class="table-card">
+  <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+    <h6 class="mb-0 fw-semibold">Órdenes recientes</h6>
+    <a href="{% url 'lista_ordenes' %}" class="btn btn-sm btn-outline-secondary">Ver todas</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Orden</th>
+          <th>Cliente</th>
+          <th>Equipo</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+          <th>Técnico</th>
+          <th>Días</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for orden in ordenes_recientes %}
+      <tr
+          class="
+              list-group-item-{{ orden.estado }}
+              {% if orden.prioridad == 'urgente' %}priority-urgente{% elif orden.prioridad == 'alta' %}priority-alta{% endif %}
+          "
+          style="cursor:pointer;"
+          onclick="window.location='{% url 'detalle_orden' orden.pk %}'"
+      >
+          <td>
+              <a href="{% url 'detalle_orden' orden.pk %}" class="fw-semibold text-decoration-none text-primary">
+                  {{ orden.numero }}
+              </a>
+          </td>
+
+          <td>
+              <a href="{% url 'detalle_cliente' orden.cliente.pk %}"
+                class="text-decoration-none text-dark"
+                onclick="event.stopPropagation();">
+                  {{ orden.cliente.nombre_completo }}
+              </a>
+          </td>
+
+          <td class="text-muted small">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</td>
+
+          <td>
+              <span class="badge badge-{{ orden.estado }}">
+                  {{ orden.get_estado_display }}
+              </span>
+          </td>
+
+          <td>
+              <span class="badge bg-{{ orden.get_prioridad_clase }}">
+                  {{ orden.get_prioridad_display }}
+              </span>
+          </td>
+
+          <td class="small text-muted">{{ orden.tecnico.get_full_name|default:"—" }}</td>
+          <td class="small text-muted">{{ orden.dias_en_taller }}d</td>
+
+          <td>
+              <a href="{% url 'detalle_orden' orden.pk %}"
+                class="btn btn-xs btn-outline-primary btn-sm py-0 px-2"
+                onclick="event.stopPropagation();">
+                  <i class="bi bi-arrow-right"></i>
+              </a>
+          </td>
+      </tr>
+      {% endfor %}
+        <!-- {% for orden in ordenes_recientes %}
+        <tr class="
+                  list-group-item-{{ orden.estado }}
+                  {% if orden.prioridad == 'urgente' %}priority-urgente{% elif orden.prioridad == 'alta' %}priority-alta{% endif %}
+                  " >
+          <td><a href="{% url 'detalle_orden' orden.pk %}" class="fw-semibold text-decoration-none text-primary">{{ orden.numero }}</a></td>
+          <td>
+            <a href="{% url 'detalle_cliente' orden.cliente.pk %}" class="text-decoration-none text-dark">
+              {{ orden.cliente.nombre_completo }}
+            </a>
+          </td>
+          <td class="text-muted small">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</td>
+          <td>
+            <span class="badge badge-{{ orden.estado }}">{{ orden.get_estado_display }}</span>
+          </td>
+          <td>
+            <span class="badge bg-{{ orden.get_prioridad_clase }}">{{ orden.get_prioridad_display }}</span>
+          </td>
+          <td class="small text-muted">{{ orden.tecnico.get_full_name|default:"—" }}</td>
+          <td class="small text-muted">{{ orden.dias_en_taller }}d</td>
+          <td>
+            <a href="{% url 'detalle_orden' orden.pk %}" class="btn btn-xs btn-outline-primary btn-sm py-0 px-2">
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No hay órdenes aún. <a href="{% url 'crear_orden' %}">Crear la primera</a></td></tr>
+        {% endfor %} -->
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

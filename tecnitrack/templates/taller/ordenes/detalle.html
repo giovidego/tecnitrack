@@ -1,0 +1,267 @@
+{% extends "taller/base.html" %}
+{% block title %}Orden {{ orden.numero }}{% endblock %}
+{% block page_title %}Orden {{ orden.numero }}{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'lista_ordenes' %}" class="btn btn-sm btn-outline-secondary">
+  <i class="bi bi-arrow-left me-1"></i> Volver
+</a>
+<a href="{{ orden.get_url_seguimiento }}" target="_blank" class="btn btn-sm btn-outline-info">
+  <i class="bi bi-eye me-1"></i> Ver seguimiento
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+
+  <!-- Columna izquierda: info orden -->
+  <div class="col-lg-8">
+
+    <!-- Header orden -->
+    <div class="form-card p-3 mb-3">
+      <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge badge-{{ orden.estado }} fs-6">{{ orden.get_estado_display }}</span>
+            <span class="badge bg-{{ orden.get_prioridad_clase }}">{{ orden.get_prioridad_display }}</span>
+          </div>
+          <h5 class="mb-0">{{ orden.equipo.get_tipo_display }} {{ orden.equipo.marca }} {{ orden.equipo.modelo }}</h5>
+          <div class="text-muted small mt-1">
+            Serial: {{ orden.equipo.serial|default:"—" }} &nbsp;|&nbsp;
+            Ingreso: {{ orden.fecha_ingreso|date:"d/m/Y H:i" }} &nbsp;|&nbsp;
+            {{ orden.dias_en_taller }} días en taller
+          </div>
+        </div>
+        <div class="text-end">
+          <!-- Botón compartir link -->
+          <button class="btn btn-sm btn-success" onclick="copiarLink()" title="Copiar link de seguimiento">
+            <i class="bi bi-share me-1"></i> Compartir link
+          </button>
+          <div class="text-muted small mt-1">{{ orden.get_url_seguimiento }}</div>
+          <input type="hidden" id="link-seguimiento" value="{{ orden.get_url_seguimiento }}">
+        </div>
+      </div>
+    </div>
+
+    <!-- Cliente y Equipo -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <div class="form-card p-3 h-100">
+          <h6 class="text-muted small fw-semibold text-uppercase mb-2">Cliente</h6>
+          <div class="fw-semibold">
+            <a href="{% url 'detalle_cliente' orden.cliente.pk %}" class="text-decoration-none text-dark">
+              {{ orden.cliente.nombre_completo }}
+            </a>
+          </div>
+          {% if orden.cliente.rut %}<div class="small text-muted">RUT: {{ orden.cliente.rut }}</div>{% endif %}
+          <div class="small"><i class="bi bi-telephone me-1 text-muted"></i>{{ orden.cliente.telefono }}</div>
+          {% if orden.cliente.email %}
+          <div class="small"><i class="bi bi-envelope me-1 text-muted"></i>{{ orden.cliente.email }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-card p-3 h-100">
+          <h6 class="text-muted small fw-semibold text-uppercase mb-2">Equipo</h6>
+          <div class="fw-semibold">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</div>
+          <div class="small text-muted">{{ orden.equipo.get_tipo_display }}</div>
+          {% if orden.equipo.serial %}<div class="small">Serial: {{ orden.equipo.serial }}</div>{% endif %}
+          {% if orden.accesorios_recibidos %}
+          <div class="small text-muted mt-1"><i class="bi bi-bag me-1"></i>{{ orden.accesorios_recibidos }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Problema y diagnóstico -->
+    <div class="form-card p-3 mb-3">
+      <h6 class="text-muted small fw-semibold text-uppercase mb-2">Problema reportado</h6>
+      <p class="mb-3">{{ orden.problema_reportado }}</p>
+
+      {% if orden.diagnostico %}
+      <h6 class="text-muted small fw-semibold text-uppercase mb-2">Diagnóstico técnico</h6>
+      <p class="mb-3">{{ orden.diagnostico }}</p>
+      {% endif %}
+
+      {% if orden.solucion_aplicada %}
+      <h6 class="text-muted small fw-semibold text-uppercase mb-2">Solución aplicada</h6>
+      <p class="mb-0">{{ orden.solucion_aplicada }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Repuestos -->
+    <div class="form-card p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0 fw-semibold">Repuestos / Piezas</h6>
+        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#form-repuesto">
+          <i class="bi bi-plus"></i> Agregar
+        </button>
+      </div>
+
+      <div class="collapse mb-3" id="form-repuesto">
+        <form method="post" action="{% url 'agregar_repuesto' orden.pk %}" class="border rounded p-3 bg-light">
+          {% csrf_token %}
+          <div class="row g-2">
+            <div class="col-md-6">{{ form_repuesto.descripcion.label_tag }}{{ form_repuesto.descripcion }}</div>
+            <div class="col-md-2">{{ form_repuesto.cantidad.label_tag }}{{ form_repuesto.cantidad }}</div>
+            <div class="col-md-3">{{ form_repuesto.precio_unitario.label_tag }}{{ form_repuesto.precio_unitario }}</div>
+            <div class="col-md-1 d-flex align-items-end">
+              <button type="submit" class="btn btn-primary btn-sm w-100">+</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {% if repuestos %}
+      <table class="table table-sm">
+        <thead><tr><th>Descripción</th><th>Cant.</th><th>Precio unit.</th><th>Subtotal</th><th></th></tr></thead>
+        <tbody>
+          {% for r in repuestos %}
+          <tr>
+            <td>{{ r.descripcion }}</td>
+            <td>{{ r.cantidad }}</td>
+            <td>${{ r.precio_unitario|floatformat:0 }}</td>
+            <td>${{ r.subtotal|floatformat:0 }}</td>
+            <td>
+              <a href="{% url 'eliminar_repuesto' orden.pk r.pk %}"
+                 onclick="return confirm('¿Eliminar este repuesto?')"
+                 class="btn btn-xs btn-sm btn-outline-danger py-0 px-1">
+                <i class="bi bi-trash"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+          <tr class="fw-semibold">
+            <td colspan="3" class="text-end">Total repuestos:</td>
+            <td>${{ total_repuestos|floatformat:0 }}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      {% else %}
+      <p class="text-muted small mb-0">Sin repuestos agregados.</p>
+      {% endif %}
+    </div>
+
+    <!-- Historial -->
+    <div class="form-card p-3">
+      <h6 class="mb-3 fw-semibold">Historial de estados</h6>
+      <div class="timeline">
+        {% for h in historial %}
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="d-flex justify-content-between">
+            <strong class="small">{{ h.get_estado_nuevo_display|default:h.estado_nuevo }}</strong>
+            <span class="small text-muted">{{ h.creado_en|date:"d/m/Y H:i" }}</span>
+          </div>
+          {% if h.comentario %}<div class="small text-muted mt-1">{{ h.comentario }}</div>{% endif %}
+          <div class="small text-muted">
+            {{ h.usuario.get_full_name|default:h.usuario.username|default:"Sistema" }}
+            {% if h.notificado %}<span class="text-success ms-1"><i class="bi bi-check2"></i> Cliente notificado</span>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div><!-- /col-lg-8 -->
+
+  <!-- Columna derecha: cambio de estado y presupuesto -->
+  <div class="col-lg-4">
+
+    <!-- Cambiar estado -->
+    <div class="form-card p-3 mb-3">
+      <h6 class="mb-3 fw-semibold">Actualizar estado</h6>
+      <form method="post" action="{% url 'cambiar_estado' orden.pk %}">
+        {% csrf_token %}
+        <div class="mb-2">
+          <label class="form-label">Estado</label>
+          {{ form_estado.estado }}
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Diagnóstico técnico</label>
+          {{ form_estado.diagnostico }}
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Solución aplicada</label>
+          {{ form_estado.solucion_aplicada }}
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Comentario para el cliente</label>
+          {{ form_estado.comentario }}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-arrow-repeat me-1"></i> Actualizar y notificar
+        </button>
+      </form>
+    </div>
+
+    <!-- Presupuesto -->
+    <div class="form-card p-3 mb-3">
+      <h6 class="mb-3 fw-semibold">Presupuesto</h6>
+      <form method="post" action="{% url 'cambiar_estado' orden.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="estado" value="{{ orden.estado }}">
+        <div class="mb-2">
+          <label class="form-label">Presupuesto ($)</label>
+          {{ form_estado.presupuesto }}
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Estado aprobación</label>
+          {{ form_estado.presupuesto_aprobado }}
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Costo final ($)</label>
+          {{ form_estado.costo_final }}
+        </div>
+        <button type="submit" class="btn btn-outline-success w-100 btn-sm">
+          <i class="bi bi-currency-dollar me-1"></i> Guardar presupuesto
+        </button>
+      </form>
+      {% if orden.presupuesto %}
+      <div class="mt-2 p-2 rounded bg-light small">
+        <div>Presupuesto: <strong>${{ orden.presupuesto|floatformat:0 }}</strong></div>
+        {% if orden.presupuesto_aprobado is not None %}
+        <div>Estado: 
+          <span class="badge {% if orden.presupuesto_aprobado %}bg-success{% else %}bg-danger{% endif %}">
+            {% if orden.presupuesto_aprobado %}Aprobado{% else %}Rechazado{% endif %}
+          </span>
+        </div>
+        {% endif %}
+        {% if orden.costo_final %}
+        <div>Costo final: <strong>${{ orden.costo_final|floatformat:0 }}</strong></div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Info técnico -->
+    <div class="form-card p-3">
+      <h6 class="mb-2 fw-semibold">Técnico asignado</h6>
+      <div>{{ orden.tecnico.get_full_name|default:"Sin asignar" }}</div>
+      {% if orden.fecha_estimada %}
+      <div class="mt-2 small text-muted">
+        <i class="bi bi-calendar me-1"></i>Entrega estimada: {{ orden.fecha_estimada|date:"d/m/Y" }}
+      </div>
+      {% endif %}
+      {% if orden.notas_internas %}
+      <div class="mt-2 p-2 bg-warning bg-opacity-10 rounded small">
+        <strong>Notas internas:</strong><br>{{ orden.notas_internas }}
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copiarLink() {
+  const link = document.getElementById('link-seguimiento').value;
+  navigator.clipboard.writeText(link).then(() => {
+    alert('¡Link de seguimiento copiado!\n' + link);
+  });
+}
+</script>
+{% endblock %}

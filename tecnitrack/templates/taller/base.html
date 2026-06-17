@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}TecniTrack{% endblock %} - {% if taller_actual %}{{ taller_actual.nombre }}{% else %}TecniTrack{% endif %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-width: 240px;
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --sidebar-bg: #1e1b4b;
+      --sidebar-text: rgba(255,255,255,0.75);
+      --sidebar-active: rgba(255,255,255,0.12);
+    }
+    body { background: #f8f7ff; font-family: 'Segoe UI', system-ui, sans-serif; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      z-index: 100; overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    .sidebar-brand {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-brand .brand-name {
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      text-decoration: none; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .sidebar-brand .brand-icon {
+      width: 32px; height: 32px; background: var(--primary);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: white;
+    }
+    .sidebar-nav { padding: 1rem 0.75rem; flex: 1; }
+    .sidebar-section {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.35);
+      padding: 0.75rem 0.75rem 0.25rem;
+    }
+    .sidebar-nav .nav-link {
+      color: var(--sidebar-text); border-radius: 8px;
+      padding: 0.6rem 0.75rem; font-size: 0.875rem; font-weight: 500;
+      display: flex; align-items: center; gap: 0.6rem;
+      transition: all 0.15s;
+    }
+    .sidebar-nav .nav-link:hover { background: var(--sidebar-active); color: #fff; }
+    .sidebar-nav .nav-link.active { background: var(--primary); color: #fff; }
+    .sidebar-nav .nav-link i { font-size: 1rem; width: 18px; text-align: center; }
+    .sidebar-footer {
+      padding: 1rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.8rem; color: rgba(255,255,255,0.5);
+    }
+    .sidebar-footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    .sidebar-footer a:hover { color: white; }
+    
+    /* Main */
+    .main-content { margin-left: var(--sidebar-width); min-height: 100vh; }
+    .topbar {
+      background: #fff; border-bottom: 1px solid #e5e7eb;
+      padding: 0.75rem 1.5rem; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 50;
+    }
+    .topbar h1 { font-size: 1.1rem; font-weight: 600; color: #111827; margin: 0; }
+    .page-body { padding: 1.5rem; }
+
+    /* Cards */
+    .stat-card {
+      background: white; border-radius: 12px; padding: 1.25rem;
+      border: 1px solid #e5e7eb; transition: box-shadow 0.15s;
+    }
+    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .stat-card .stat-number { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .stat-card .stat-label { font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem; }
+
+    /* Badges estado */
+    .badge-recibido { background: #6b7280 !important; }
+    .badge-diagnostico { background: #0ea5e9 !important; }
+    .badge-espera_repuestos { background: #f59e0b !important; }
+    .badge-en_reparacion { background: #4f46e5 !important; }
+    .badge-listo { background: #10b981 !important; }
+    .badge-entregado { background: #374151 !important; }
+    .badge-cancelado { background: #ef4444 !important; }
+    
+    /* Filas según estado */
+    tr.list-group-item-recibido > td {
+    background-color: rgba(107, 114, 128, 0.12) !important;
+    }
+    tr.list-group-item-diagnostico > td {
+        background-color: rgba(14, 165, 233, 0.12) !important;
+    }
+    tr.list-group-item-espera_repuestos > td {
+        background-color: rgba(245, 158, 11, 0.12) !important;
+    }
+    tr.list-group-item-en_reparacion > td {
+        background-color: rgba(79, 70, 229, 0.12) !important;
+    }
+    tr.list-group-item-listo > td {
+        background-color: rgba(16, 185, 129, 0.12) !important;
+    }
+    tr.list-group-item-entregado > td {
+        background-color: rgba(55, 65, 81, 0.12) !important;
+    }
+    tr.list-group-item-cancelado > td {
+        background-color: rgba(239, 68, 68, 0.12) !important;
+    }
+    /* Tabla */
+    .table-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; }
+    .table-card .table { margin: 0; }
+    .table-card .table thead th { background: #f9fafb; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
+    .table-card .table tbody tr:hover { background: #f9fafb; }
+
+    /* Formularios */
+    .form-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
+    .form-label { font-size: 0.875rem; font-weight: 500; color: #374151; }
+    
+    /* Historial timeline */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before { content: ''; position: absolute; left: 0.6rem; top: 0; bottom: 0; width: 2px; background: #e5e7eb; }
+    .timeline-item { position: relative; padding-bottom: 1.25rem; }
+    .timeline-dot { position: absolute; left: -1.5rem; width: 12px; height: 12px; border-radius: 50%; background: #4f46e5; border: 2px solid white; box-shadow: 0 0 0 2px #4f46e5; margin-top: 0.25rem; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    
+    /* Prioridad urgente */
+    .priority-urgente { border-left: 3px solid #ef4444 !important; }
+    .priority-alta { border-left: 3px solid #f59e0b !important; }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <a href="{% url 'dashboard' %}" class="brand-name">
+      <div class="brand-icon"><i class="bi bi-tools"></i></div>
+      TecniTrack
+    </a>
+    {% if taller_actual %}
+    <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); margin-top:0.35rem; padding-left:0.25rem;">
+      {{ taller_actual.nombre }}
+    </div>
+    {% endif %}
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">Principal</div>
+    <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+
+    <div class="sidebar-section">Gestión</div>
+    <a href="{% url 'lista_ordenes' %}" class="nav-link {% if 'orden' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-clipboard-check"></i> Órdenes
+    </a>
+    <a href="{% url 'lista_clientes' %}" class="nav-link {% if 'cliente' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-people"></i> Clientes
+    </a>
+
+    <div class="sidebar-section">Acciones</div>
+    <a href="{% url 'crear_orden' %}" class="nav-link">
+      <i class="bi bi-plus-circle"></i> Nueva Orden
+    </a>
+    <a href="{% url 'crear_cliente' %}" class="nav-link">
+      <i class="bi bi-person-plus"></i> Nuevo Cliente
+    </a>
+
+    {% if taller_rol == 'dueno' or taller_rol == 'admin' %}
+    <div class="sidebar-section">Taller</div>
+    <a href="{% url 'invitar_tecnico' %}" class="nav-link {% if 'invitar' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-person-plus-fill"></i> Invitar técnico
+    </a>
+    <a href="{% url 'ver_planes' %}" class="nav-link {% if 'invitar' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-person-plus-fill"></i> Planes
+    </a>
+    {% endif %}
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="mb-1"><i class="bi bi-person-circle me-1"></i>{{ request.user.get_full_name|default:request.user.username }}</div>
+    {% if taller_rol %}<div class="mb-1" style="font-size:0.7rem;">{{ taller_rol|capfirst }}</div>{% endif %}
+    <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-left me-1"></i>Cerrar sesión</a>
+  </div>
+</div>
+
+<div class="main-content">
+  <div class="topbar">
+    <h1>{% block page_title %}{% endblock %}</h1>
+    <div class="d-flex gap-2">{% block topbar_actions %}{% endblock %}</div>
+  </div>
+
+  {% if request.session.trial_dias_restantes is not None %}
+  <div style="background:#fffbeb; border-bottom:1px solid #fde68a; padding:0.6rem 1.5rem; display:flex; align-items:center; justify-content:space-between; font-size:0.85rem;">
+    <div>
+      <i class="bi bi-clock-history text-warning me-1"></i>
+      {% if request.session.trial_dias_restantes == 0 %}
+        <strong>Tu período de prueba vence hoy.</strong> Contrata un plan para seguir usando TecniTrack.
+      {% else %}
+        <strong>Te quedan {{ request.session.trial_dias_restantes }} días de prueba gratis.</strong>
+        Después necesitarás un plan para continuar.
+      {% endif %}
+    </div>
+    <a href="#" class="btn btn-warning btn-sm fw-semibold ms-3">Ver planes</a>
+  </div>
+  {% endif %}
+
+  <div class="page-body">
+    {% if messages %}
+    {% for msg in messages %}
+    <div class="alert alert-{% if msg.tags == 'error' %}danger{% else %}{{ msg.tags }}{% endif %} alert-dismissible fade show" role="alert">
+      {{ msg }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

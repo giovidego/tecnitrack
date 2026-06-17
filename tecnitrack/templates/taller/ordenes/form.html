@@ -1,0 +1,125 @@
+{% extends "taller/base.html" %}
+{% block title %}Nueva Orden{% endblock %}
+{% block page_title %}{{ titulo }}{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'lista_ordenes' %}" class="btn btn-sm btn-outline-secondary">
+  <i class="bi bi-arrow-left me-1"></i> Cancelar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Cliente y equipo -->
+      <div class="form-card p-4 mb-3">
+        <h6 class="fw-semibold mb-3">1. Cliente y equipo</h6>
+        <div class="row g-3">
+          <div class="col-md-5">
+            <label class="form-label">Cliente *</label>
+            {{ form.cliente }}
+            <div class="mt-1">
+              <a href="{% url 'crear_cliente' %}?next=orden" class="small text-primary">
+                <i class="bi bi-plus-circle"></i> Registrar nuevo cliente
+              </a>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Equipo *</label>
+            {{ form.equipo }}
+            <div class="mt-1" id="link-nuevo-equipo" style="display:none">
+              <a href="#" id="btn-nuevo-equipo" class="small text-primary">
+                <i class="bi bi-plus-circle"></i> Registrar nuevo equipo
+              </a>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Técnico</label>
+            {{ form.tecnico }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Problema -->
+      <div class="form-card p-4 mb-3">
+        <h6 class="fw-semibold mb-3">2. Problema reportado</h6>
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Descripción del problema *</label>
+            {{ form.problema_reportado }}
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Accesorios recibidos</label>
+            {{ form.accesorios_recibidos }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Prioridad</label>
+            {{ form.prioridad }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Presupuesto y fechas -->
+      <div class="form-card p-4 mb-3">
+        <h6 class="fw-semibold mb-3">3. Presupuesto y fecha estimada</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Presupuesto inicial ($)</label>
+            {{ form.presupuesto }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Fecha estimada entrega</label>
+            {{ form.fecha_estimada }}
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Notas internas (no visibles al cliente)</label>
+            {{ form.notas_internas }}
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 justify-content-end">
+        <a href="{% url 'lista_ordenes' %}" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="bi bi-check-lg me-1"></i> Crear orden y notificar cliente
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Carga dinámica de equipos al cambiar cliente
+const selectCliente = document.getElementById('id_cliente');
+const selectEquipo = document.getElementById('id_equipo');
+const linkNuevoEquipo = document.getElementById('link-nuevo-equipo');
+const btnNuevoEquipo = document.getElementById('btn-nuevo-equipo');
+
+selectCliente.addEventListener('change', function() {
+  const clienteId = this.value;
+  if (!clienteId) {
+    selectEquipo.innerHTML = '<option value="">---------</option>';
+    linkNuevoEquipo.style.display = 'none';
+    return;
+  }
+  fetch(`/api/clientes/${clienteId}/equipos/`)
+    .then(r => r.json())
+    .then(data => {
+      selectEquipo.innerHTML = '<option value="">---------</option>';
+      data.equipos.forEach(eq => {
+        const opt = document.createElement('option');
+        opt.value = eq.id;
+        opt.textContent = `${eq.marca} ${eq.modelo || ''} (${eq.tipo})`;
+        selectEquipo.appendChild(opt);
+      });
+      linkNuevoEquipo.style.display = 'block';
+      btnNuevoEquipo.href = `/clientes/${clienteId}/equipos/nuevo/?next=orden`;
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear cuenta — TecniTrack</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    body { background: #f0f0ff; min-height: 100vh; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .page-wrap { display: flex; min-height: 100vh; }
+
+    /* Panel izquierdo - info */
+    .info-panel { background: linear-gradient(160deg, #1e1b4b, #4338ca); color: white; padding: 3rem 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .info-brand { font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2.5rem; }
+    .info-brand .icon { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .info-panel h2 { font-size: 1.6rem; font-weight: 800; line-height: 1.3; margin-bottom: 1.5rem; }
+    .info-panel h2 span { color: #a5b4fc; }
+    .benefit { display: flex; gap: 0.75rem; margin-bottom: 1rem; align-items: flex-start; }
+    .benefit-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .benefit-text { font-size: 0.9rem; color: rgba(255,255,255,0.85); line-height: 1.5; }
+    .benefit-text strong { color: white; display: block; margin-bottom: 0.1rem; }
+    .trial-badge { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 0.875rem 1.25rem; margin-top: 2rem; font-size: 0.85rem; color: rgba(255,255,255,0.85); }
+    .trial-badge strong { color: white; }
+
+    /* Panel derecho - formulario */
+    .form-panel { background: white; padding: 3rem 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .form-panel h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.35rem; }
+    .form-panel .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 2rem; }
+
+    /* Selector de plan */
+    .plan-selector { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .plan-option { flex: 1; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 0.6rem 0.5rem; text-align: center; cursor: pointer; transition: all 0.15s; }
+    .plan-option:hover { border-color: #c7d2fe; }
+    .plan-option.selected { border-color: #4f46e5; background: #eef2ff; }
+    .plan-option .plan-name { font-size: 0.8rem; font-weight: 700; color: #374151; }
+    .plan-option .plan-price { font-size: 0.7rem; color: #6b7280; margin-top: 0.1rem; }
+    .plan-option.selected .plan-name { color: #4f46e5; }
+
+    .form-label { font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.35rem; }
+    .form-control-lg, .form-select-lg { font-size: 0.95rem; }
+    .btn-submit { background: #4f46e5; color: white; border: none; padding: 0.875rem; border-radius: 10px; font-size: 1rem; font-weight: 700; width: 100%; transition: all 0.2s; }
+    .btn-submit:hover { background: #3730a3; transform: translateY(-1px); }
+    .login-link { text-align: center; margin-top: 1.25rem; font-size: 0.875rem; color: #6b7280; }
+    .login-link a { color: #4f46e5; text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Panel izquierdo -->
+  <div class="col-lg-5 info-panel d-none d-lg-flex flex-column">
+    <div class="info-brand">
+      <div class="icon"><i class="bi bi-tools"></i></div>
+      TecniTrack
+    </div>
+    <h2>Tu taller listo en <span>menos de 5 minutos</span></h2>
+
+    <div class="benefit">
+      <div class="benefit-icon"><i class="bi bi-clipboard-check"></i></div>
+      <div class="benefit-text">
+        <strong>Órdenes organizadas</strong>
+        Cada equipo tiene su número de orden, estado y técnico asignado.
+      </div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon"><i class="bi bi-link-45deg"></i></div>
+      <div class="benefit-text">
+        <strong>Link de seguimiento automático</strong>
+        El cliente ve el estado de su equipo sin llamarte.
+      </div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon"><i class="bi bi-bell"></i></div>
+      <div class="benefit-text">
+        <strong>Notificaciones en cada cambio</strong>
+        Email automático al cliente con el nombre de tu taller.
+      </div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon"><i class="bi bi-people"></i></div>
+      <div class="benefit-text">
+        <strong>Invita a tus técnicos</strong>
+        Cada técnico con su propio acceso y sus órdenes asignadas.
+      </div>
+    </div>
+
+    <div class="trial-badge">
+      <i class="bi bi-gift me-1"></i>
+      <strong>30 días gratis</strong> — Sin tarjeta de crédito. Sin compromiso.
+      Cancela cuando quieras.
+    </div>
+  </div>
+
+  <!-- Panel derecho - form -->
+  <div class="col-lg-7 form-panel">
+    <div style="max-width: 420px; margin: 0 auto; width: 100%;">
+
+      <h1>Crea tu cuenta gratis</h1>
+      <p class="subtitle">Sin tarjeta de crédito · Listo en 2 minutos</p>
+
+      <!-- Selector de plan -->
+      <div class="mb-3">
+        <div class="form-label">Elige tu plan</div>
+        <div class="plan-selector">
+          {% for plan_key, plan_info in planes.items %}
+          <div class="plan-option {% if plan_key == plan_inicial %}selected{% endif %}"
+               onclick="seleccionarPlan('{{ plan_key }}', this)">
+            <div class="plan-name">{{ plan_info.nombre }}</div>
+            <div class="plan-price">${{ plan_info.precio|floatformat:0 }}/mes</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if messages %}
+      {% for msg in messages %}
+      <div class="alert alert-danger py-2 small">{{ msg }}</div>
+      {% endfor %}
+      {% endif %}
+
+      <form method="post" id="form-registro">
+        {% csrf_token %}
+        {{ form.plan_elegido }}
+
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Nombre de tu taller *</label>
+            {{ form.nombre_taller }}
+            {% if form.nombre_taller.errors %}
+            <div class="text-danger small mt-1">{{ form.nombre_taller.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Tu nombre completo *</label>
+            {{ form.nombre_dueno }}
+          </div>
+          <div class="col-md-7">
+            <label class="form-label">Email de contacto *</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Teléfono *</label>
+            {{ form.telefono }}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Ciudad</label>
+            {{ form.ciudad }}
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              {{ form.acepta_terminos }}
+              <label class="form-check-label small" for="{{ form.acepta_terminos.id_for_label }}">
+                Acepto los <a href="#" class="text-primary">términos de uso</a> y <a href="#" class="text-primary">política de privacidad</a>
+              </label>
+              {% if form.acepta_terminos.errors %}
+              <div class="text-danger small">{{ form.acepta_terminos.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit mt-4">
+          <i class="bi bi-rocket-takeoff me-2"></i>Crear mi cuenta gratis
+        </button>
+      </form>
+
+      <div class="login-link">
+        ¿Ya tienes cuenta? <a href="{% url 'login' %}">Ingresar</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function seleccionarPlan(plan, el) {
+  document.querySelectorAll('.plan-option').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  document.querySelector('[name=plan_elegido]').value = plan;
+}
+</script>
+</body>
+</html>

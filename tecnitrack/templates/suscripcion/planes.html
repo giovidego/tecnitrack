@@ -1,0 +1,103 @@
+{% extends "taller/base.html" %}
+{% block title %}Planes{% endblock %}
+{% block page_title %}Planes y suscripción{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+
+    {% if suscripcion %}
+    <div class="form-card p-3 mb-4 d-flex align-items-center justify-content-between gap-3">
+      <div>
+        <div class="fw-semibold">Plan actual:
+          <span class="badge bg-primary ms-1">{{ suscripcion.get_plan_display|default:suscripcion.plan|capfirst }}</span>
+          <span class="badge bg-{{ suscripcion.estado|yesno:'success,warning,danger,secondary' }} ms-1">
+            {{ suscripcion.get_estado_display }}
+          </span>
+        </div>
+        {% if suscripcion.estado == 'trial' %}
+        <div class="text-muted small mt-1">
+          Te quedan <strong>{{ suscripcion.dias_trial_restantes }} días</strong> de prueba gratuita.
+        </div>
+        {% endif %}
+      </div>
+      {% if suscripcion.estado == 'trial' %}
+      <div class="text-muted small">Contrata un plan para continuar después del trial.</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="text-center mb-4">
+      <h4 class="fw-bold">Elige el plan que se adapta a tu taller</h4>
+      <p class="text-muted">Todos los planes incluyen link de seguimiento y notificaciones automáticas.</p>
+    </div>
+
+    <div class="row g-3">
+      {% for plan_key, plan in planes.items %}
+      <div class="col-md-4">
+        <div class="form-card p-4 h-100 {% if plan_key == 'profesional' %}border border-primary{% endif %}" style="position:relative;">
+          {% if plan_key == 'profesional' %}
+          <div class="badge bg-primary" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:0.35rem 1rem;">
+            Más popular
+          </div>
+          {% endif %}
+
+          <h5 class="fw-bold mb-1">{{ plan.nombre }}</h5>
+          <div class="mb-3">
+            <span style="font-size:2rem;font-weight:800;">${{ plan.precio|floatformat:0 }}</span>
+            <span class="text-muted"> CLP / mes</span>
+          </div>
+
+          <ul class="list-unstyled mb-4" style="font-size:0.875rem;">
+            <li class="mb-2">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>
+              {% if plan.max_tecnicos %}{{ plan.max_tecnicos }} técnicos{% else %}Técnicos ilimitados{% endif %}
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>
+              {% if plan.max_ordenes_mes %}{{ plan.max_ordenes_mes }} órdenes/mes{% else %}Órdenes ilimitadas{% endif %}
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>
+              Link de seguimiento para clientes
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>
+              Notificaciones automáticas por email
+            </li>
+            {% if plan_key != 'basico' %}
+            <li class="mb-2">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>
+              Reportes básicos
+            </li>
+            {% endif %}
+            {% if plan_key == 'ilimitado' %}
+            <li class="mb-2">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>
+              Múltiples sucursales
+            </li>
+            {% endif %}
+          </ul>
+
+          <a href="mailto:hola@tecnitrack.cl?subject=Contratar plan {{ plan.nombre }} - {{ taller.nombre }}"
+             class="btn {% if plan_key == 'profesional' %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+            {% if suscripcion and suscripcion.plan == plan_key and suscripcion.estado == 'activa' %}
+              Plan actual
+            {% else %}
+              Contratar {{ plan.nombre }}
+            {% endif %}
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4 text-muted small">
+      Para contratar o cambiar de plan escríbenos a
+      <a href="mailto:hola@tecnitrack.cl" class="text-primary">hola@tecnitrack.cl</a>.
+      Respondemos en menos de 24 horas.
+    </div>
+
+  </div>
+</div>
+{% endblock %}

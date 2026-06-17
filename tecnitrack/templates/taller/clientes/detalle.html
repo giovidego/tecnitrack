@@ -1,0 +1,148 @@
+{% extends "taller/base.html" %}
+{% block title %}{{ cliente.nombre_completo }}{% endblock %}
+{% block page_title %}{{ cliente.nombre_completo }}{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'lista_clientes' %}" class="btn btn-sm btn-outline-secondary">
+  <i class="bi bi-arrow-left me-1"></i> Clientes
+</a>
+<a href="{% url 'editar_cliente' cliente.pk %}" class="btn btn-sm btn-outline-secondary">
+  <i class="bi bi-pencil me-1"></i> Editar
+</a>
+<a href="{% url 'crear_orden_cliente' cliente.pk %}" class="btn btn-sm btn-primary">
+  <i class="bi bi-plus me-1"></i> Nueva orden
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-md-4">
+    <!-- Info cliente -->
+    <div class="form-card p-3 mb-3">
+      <h6 class="text-muted small fw-semibold text-uppercase mb-3">Información</h6>
+      <table class="table table-sm table-borderless mb-0">
+        <tr><td class="text-muted small">Nombre</td><td class="fw-medium">{{ cliente.nombre_completo }}</td></tr>
+        {% if cliente.rut %}<tr><td class="text-muted small">RUT</td><td>{{ cliente.rut }}</td></tr>{% endif %}
+        <tr><td class="text-muted small">Teléfono</td><td>{{ cliente.telefono }}</td></tr>
+        {% if cliente.email %}<tr><td class="text-muted small">Email</td><td class="small">{{ cliente.email }}</td></tr>{% endif %}
+        {% if cliente.direccion %}<tr><td class="text-muted small">Dirección</td><td class="small">{{ cliente.direccion }}</td></tr>{% endif %}
+        <tr><td class="text-muted small">Cliente desde</td><td class="small">{{ cliente.creado_en|date:"d/m/Y" }}</td></tr>
+      </table>
+      {% if cliente.notas %}
+      <div class="mt-2 p-2 bg-light rounded small">{{ cliente.notas }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Equipos -->
+    <div class="form-card p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0 text-muted small fw-semibold text-uppercase">Equipos ({{ equipos.count }})</h6>
+        <a href="{% url 'crear_equipo' cliente.pk %}" class="btn btn-xs btn-sm btn-outline-primary py-0 px-2">
+          <i class="bi bi-plus"></i>
+        </a>
+      </div>
+      {% for equipo in equipos %}
+      <div class="d-flex align-items-center gap-2 py-2 border-bottom last:border-0">
+        <div class="text-muted"><i class="bi bi-laptop fs-5"></i></div>
+        <div>
+          <div class="fw-medium small">{{ equipo.marca }} {{ equipo.modelo }}</div>
+          <div class="text-muted" style="font-size:0.75rem">{{ equipo.get_tipo_display }}{% if equipo.serial %} · {{ equipo.serial }}{% endif %}</div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-muted small">Sin equipos registrados.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Historial órdenes -->
+  <div class="col-md-8">
+    <div class="table-card">
+      <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-semibold">Órdenes de reparación ({{ ordenes.count }})</h6>
+        <a href="{% url 'crear_orden_cliente' cliente.pk %}" class="btn btn-sm btn-primary">
+          <i class="bi bi-plus me-1"></i> Nueva orden
+        </a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Orden</th>
+              <th>Equipo</th>
+              <th>Problema</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for orden in ordenes %}
+            <tr class="
+              list-group-item-{{ orden.estado }}
+              {% if orden.prioridad == 'urgente' %}priority-urgente{% elif orden.prioridad == 'alta' %}priority-alta{% endif %}
+                "
+                style="cursor:pointer;"
+                onclick="window.location='{% url 'detalle_orden' orden.pk %}'"
+            >
+                <td>
+                    <a href="{% url 'detalle_orden' orden.pk %}"
+                      class="fw-semibold text-decoration-none text-primary"
+                      onclick="event.stopPropagation();">
+                        {{ orden.numero }}
+                    </a>
+                </td>
+
+                <td class="small text-muted">
+                    {{ orden.equipo.marca }} {{ orden.equipo.modelo }}
+                </td>
+
+                <td class="small text-muted text-truncate" style="max-width:150px">
+                    {{ orden.problema_reportado|truncatechars:50 }}
+                </td>
+
+                <td>
+                    <span class="badge badge-{{ orden.estado }}">
+                        {{ orden.get_estado_display }}
+                    </span>
+                </td>
+
+                <td class="small text-muted">
+                    {{ orden.fecha_ingreso|date:"d/m/Y" }}
+                </td>
+
+                <td>
+                    <a href="{% url 'detalle_orden' orden.pk %}"
+                      class="btn btn-sm btn-outline-primary py-0 px-2"
+                      onclick="event.stopPropagation();">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                    Sin órdenes aún.
+                </td>
+            </tr>
+            {% endfor %}
+            <!-- {% for orden in ordenes %}
+            <tr>
+              <td><a href="{% url 'detalle_orden' orden.pk %}" class="fw-semibold text-decoration-none text-primary">{{ orden.numero }}</a></td>
+              <td class="small text-muted">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</td>
+              <td class="small text-muted" style="max-width:150px" class="text-truncate">{{ orden.problema_reportado|truncatechars:50 }}</td>
+              <td><span class="badge badge-{{ orden.estado }}">{{ orden.get_estado_display }}</span></td>
+              <td class="small text-muted">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+              <td><a href="{% url 'detalle_orden' orden.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2"><i class="bi bi-eye"></i></a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">Sin órdenes aún.</td></tr>
+            {% endfor %} -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

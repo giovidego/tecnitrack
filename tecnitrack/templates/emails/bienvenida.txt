@@ -1,0 +1,21 @@
+¡Bienvenido a TecniTrack, {{ usuario.first_name }}!
+==============================================
+
+Tu taller {{ taller.nombre }} está listo.
+
+Tu período de prueba de 30 días ha comenzado.
+Sin cobros. Sin compromisos.
+
+Primeros pasos:
+1. Crea tu primer cliente → Clientes → Nuevo Cliente
+2. Crea una orden de reparación
+3. Comparte el link de seguimiento con el cliente
+4. Invita a tus técnicos desde Equipo → Invitar técnico
+
+Ir a tu panel:
+{{ site_url }}/dashboard/
+
+¿Tienes preguntas? Responde este email.
+
+--
+TecniTrack · Software para talleres de reparación

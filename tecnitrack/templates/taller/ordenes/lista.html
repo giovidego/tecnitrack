@@ -1,0 +1,181 @@
+{% extends "taller/base.html" %}
+{% load taller_extras %}
+{% block title %}Órdenes{% endblock %}
+{% block page_title %}Órdenes de Reparación{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'crear_orden' %}" class="btn btn-primary btn-sm">
+  <i class="bi bi-plus-lg me-1"></i> Nueva Orden
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filtros por estado -->
+<div class="d-flex gap-2 mb-3 flex-wrap">
+  <a href="{% url 'lista_ordenes' %}{% if q %}?q={{ q }}{% endif %}" 
+     class="btn btn-sm {% if not estado_filtro %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+    Todas ({{ estados_count.recibido|add:estados_count.diagnostico|add:estados_count.espera_repuestos|add:estados_count.en_reparacion|add:estados_count.listo }})
+  </a>
+  {% for e_key, e_label in estados %}
+  <a href="?estado={{ e_key }}{% if q %}&q={{ q }}{% endif %}"
+     class="btn btn-sm 
+     
+     {% if estado_filtro == e_key %}
+      {% if e_key == 'recibido' %}btn-secondary
+      {% elif e_key == 'diagnostico' %}btn-info
+      {% elif e_key == 'espera_repuestos' %}btn-warning
+      {% elif e_key == 'en_reparacion' %}btn-primary
+      {% elif e_key == 'listo' %}btn-success
+      {% elif e_key == 'entregado' %}btn-dark
+      {% elif e_key == 'cancelado' %}btn-danger
+      {% else %}btn-dark
+      {% endif %}
+   {% else %}
+      btn-outline-secondary
+   {% endif %}"">
+    {{ e_label }} ({{ estados_count|get_item:e_key|default:0 }})
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Buscador -->
+<form method="get" class="mb-3">
+  {% if estado_filtro %}<input type="hidden" name="estado" value="{{ estado_filtro }}">{% endif %}
+  <div class="input-group" style="max-width:400px">
+    <input type="text" name="q" class="form-control" placeholder="Buscar por N° orden, cliente, marca..." value="{{ q }}">
+    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+  </div>
+</form>
+
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>N° Orden</th>
+          <th>Cliente</th>
+          <th>Equipo</th>
+          <th>Problema</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+          <th>Técnico</th>
+          <th>Ingreso</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for orden in ordenes %}
+        <tr
+          class="
+            list-group-item-{{ orden.estado }}
+            {% if orden.prioridad == 'urgente' %}priority-urgente{% elif orden.prioridad == 'alta' %}priority-alta{% endif %}
+          "
+          style="cursor:pointer;"
+          onclick="window.location='{% url 'detalle_orden' orden.pk %}'"
+        >
+          <td>
+            <a href="{% url 'detalle_orden' orden.pk %}"
+              class="fw-semibold text-decoration-none text-primary"
+              onclick="event.stopPropagation();">
+              {{ orden.numero }}
+            </a>
+          </td>
+
+          <td>
+            <div class="fw-medium">{{ orden.cliente.nombre_completo }}</div>
+            <div class="text-muted small">{{ orden.cliente.telefono }}</div>
+          </td>
+
+          <td class="small">
+            <span class="badge bg-light text-dark">
+              {{ orden.equipo.get_tipo_display }}
+            </span><br>
+            <span class="text-muted">
+              {{ orden.equipo.marca }} {{ orden.equipo.modelo }}
+            </span>
+          </td>
+
+          <td style="max-width:200px" class="small text-muted text-truncate">
+            {{ orden.problema_reportado }}
+          </td>
+
+          <td>
+            <span class="badge badge-{{ orden.estado }}">
+              {{ orden.get_estado_display }}
+            </span>
+          </td>
+
+          <td>
+            <span class="badge bg-{{ orden.get_prioridad_clase }}">
+              {{ orden.get_prioridad_display }}
+            </span>
+          </td>
+
+          <td class="small text-muted">
+            {{ orden.tecnico.get_full_name|default:"—" }}
+          </td>
+
+          <td class="small text-muted">
+            {{ orden.fecha_ingreso|date:"d/m/y" }}
+          </td>
+
+          <td>
+            <a href="{% url 'detalle_orden' orden.pk %}"
+              class="btn btn-sm btn-outline-primary py-0 px-2"
+              onclick="event.stopPropagation();">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="text-center text-muted py-5">
+            <i class="bi bi-clipboard-x fs-2 d-block mb-2"></i>
+            No hay órdenes{% if q %} con esos criterios{% endif %}.
+            <a href="{% url 'crear_orden' %}">Crear la primera</a>
+          </td>
+        </tr>
+        {% endfor %}
+        <!-- {% for orden in ordenes %}
+        <tr class="
+                  list-group-item-{{ orden.estado }}
+                  {% if orden.prioridad == 'urgente' %}priority-urgente{% elif orden.prioridad == 'alta' %}priority-alta{% endif %}
+                  " >
+          <td>
+            <a href="{% url 'detalle_orden' orden.pk %}" class="fw-semibold text-decoration-none text-primary">
+              {{ orden.numero }}
+            </a>
+          </td>
+          <td>
+            <div class="fw-medium">{{ orden.cliente.nombre_completo }}</div>
+            <div class="text-muted small">{{ orden.cliente.telefono }}</div>
+          </td>
+          <td class="small">
+            <span class="badge bg-light text-dark">{{ orden.equipo.get_tipo_display }}</span><br>
+            <span class="text-muted">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</span>
+          </td>
+          <td style="max-width:200px" class="small text-muted text-truncate">{{ orden.problema_reportado }}</td>
+          <td><span class="badge badge-{{ orden.estado }}">{{ orden.get_estado_display }}</span></td>
+          <td><span class="badge bg-{{ orden.get_prioridad_clase }}">{{ orden.get_prioridad_display }}</span></td>
+          <td class="small text-muted">{{ orden.tecnico.get_full_name|default:"—" }}</td>
+          <td class="small text-muted">{{ orden.fecha_ingreso|date:"d/m/y" }}</td>
+          <td>
+            <a href="{% url 'detalle_orden' orden.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="text-center text-muted py-5">
+            <i class="bi bi-clipboard-x fs-2 d-block mb-2"></i>
+            No hay órdenes{% if q %} con esos criterios{% endif %}.
+            <a href="{% url 'crear_orden' %}">Crear la primera</a>
+          </td>
+        </tr>
+        {% endfor %} -->
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

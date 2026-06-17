@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8">
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f7ff; margin: 0; padding: 20px; }
+  .c { max-width: 540px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; }
+  .h { background: linear-gradient(135deg, #1e1b4b, #4338ca); padding: 28px; color: white; }
+  .h h1 { font-size: 1.1rem; margin: 0 0 4px; }
+  .h p { color: rgba(255,255,255,0.7); margin: 0; font-size: 0.85rem; }
+  .b { padding: 28px; }
+  .taller-box { background: #eef2ff; border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; display: flex; align-items: center; gap: 12px; }
+  .taller-icon { width: 40px; height: 40px; background: #4f46e5; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; flex-shrink: 0; }
+  .btn { display: block; background: #4f46e5; color: white !important; text-decoration: none; padding: 14px 24px; border-radius: 10px; text-align: center; font-weight: 700; margin: 20px 0; }
+  .footer { background: #f9fafb; padding: 16px 28px; text-align: center; font-size: 0.75rem; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+<div class="c">
+  <div class="h">
+    <h1>🔧 TecniTrack</h1>
+    <p>Tienes una invitación para unirte a un taller</p>
+  </div>
+  <div class="b">
+    <p>Hola,</p>
+    <p>Te invitaron a unirte como <strong>{{ invitacion.get_rol_display }}</strong> en:</p>
+    <div class="taller-box">
+      <div class="taller-icon">🔧</div>
+      <div>
+        <div style="font-weight:700;">{{ invitacion.taller.nombre }}</div>
+        <div style="font-size:0.8rem; color:#6b7280;">Servicio técnico en TecniTrack</div>
+      </div>
+    </div>
+    <p>Acepta la invitación y crea tu cuenta para empezar:</p>
+    <a href="{{ url_invitacion }}" class="btn">✅ Aceptar invitación</a>
+    <p style="font-size:0.8rem; color:#9ca3af;">Esta invitación expira en 7 días. Si no conoces este taller, ignora este email.</p>
+  </div>
+  <div class="footer">TecniTrack · Software para talleres de reparación</div>
+</div>
+</body>
+</html>

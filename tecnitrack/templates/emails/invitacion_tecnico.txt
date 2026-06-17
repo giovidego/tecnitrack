@@ -1,0 +1,16 @@
+TecniTrack — Invitación al taller {{ invitacion.taller.nombre }}
+================================================================
+
+Hola,
+
+Te invitaron a unirte como {{ invitacion.get_rol_display }} en:
+{{ invitacion.taller.nombre }}
+
+Acepta la invitación aquí:
+{{ url_invitacion }}
+
+Esta invitación expira en 7 días.
+Si no conoces este taller, ignora este email.
+
+--
+TecniTrack · Software para talleres de reparación
