@@ -3,6 +3,7 @@
 
 django>=4.2,<5.0
 django-tenants>=3.5.0      # Motor de multi-tenancy por schema PostgreSQL
+django-cache
 psycopg2-binary>=2.9       # Driver PostgreSQL (OBLIGATORIO con django-tenants)
 Pillow>=10.0               # Manejo de imagenes
 gunicorn>=21.0             # Servidor WSGI para produccion
