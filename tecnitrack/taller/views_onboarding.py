@@ -72,19 +72,12 @@ def _enviar_email_simple(to, subject, body):
 # ─── LOGIN PUBLICO ────────────────────────────────────────────────────────────
 
 def login_publico(request):
-    """
-    Login en el schema publico (localhost:8000/login/).
-    El usuario escribe slug del taller + usuario + contrasena.
-    El sistema verifica en el schema correcto y redirige al subdominio.
-    """
     if request.method == 'POST':
         username    = request.POST.get('username', '').strip()
         password    = request.POST.get('password', '').strip()
         slug_input  = request.POST.get('slug_taller', '').strip().lower()
-        # Normalizar: demo-taller o demo_taller -> demo_taller
         schema_name = slug_input.replace('-', '_')
 
-        # 1. Buscar el taller
         try:
             taller = Taller.objects.get(schema_name=schema_name, activo=True)
         except Taller.DoesNotExist:
@@ -94,65 +87,66 @@ def login_publico(request):
                 'talleres': Taller.objects.filter(activo=True).order_by('nombre'),
             })
 
-        # 2. Verificar credenciales DENTRO del schema del taller
         from django_tenants.utils import schema_context
         from django.contrib.auth import authenticate as auth_check
+
         with schema_context(schema_name):
             usuario = auth_check(request, username=username, password=password)
 
+            # ── VERIFICACION CRITICA: el usuario debe pertenecer a ESTE taller ──
+            if usuario:
+                from taller.models import PerfilUsuario
+                tiene_perfil = PerfilUsuario.objects.filter(
+                    usuario=usuario, activo=True
+                ).exists()
+                if not tiene_perfil:
+                    usuario = None  # las credenciales son validas, pero no pertenece a este taller
+
         if not usuario:
             return render(request, 'onboarding/login_publico.html', {
-                'error': 'Usuario o contrasena incorrectos.',
+                'error': 'Usuario o contrasena incorrectos para este taller.',
                 'post': request.POST,
                 'talleres': Taller.objects.filter(activo=True).order_by('nombre'),
             })
 
-        # 3. Generar token de un solo uso
         token = _generar_token_login(usuario, schema_name, timeout=60)
-
-        # 4. Redirigir al subdominio con el token
-        url = _get_subdominio_url(request, schema_name, path=f'/auth/token/{token}/')
+        url   = _get_subdominio_url(request, schema_name, path=f'/auth/token/{token}/')
         return redirect(url)
 
     return render(request, 'onboarding/login_publico.html', {
         'talleres': Taller.objects.filter(activo=True).order_by('nombre'),
     })
 
-
 def consumir_token_login(request, token):
-    """
-    Vista en el schema del TENANT (demo-taller.localhost:8000/auth/token/<token>/).
-    Valida el token, inicia la sesion y redirige al dashboard.
-    """
     datos = cache.get(f'login_token_{token}')
 
     if not datos:
         messages.error(request, 'El link de acceso expiro o ya fue usado. Ingresa nuevamente.')
         return redirect('login_publico')
 
-    # Validar que el token corresponde a este schema
     if datos['schema'] != connection.schema_name:
         messages.error(request, 'Token invalido para este taller.')
-        cache.delete(f'login_token_{token}')
         return redirect('login_publico')
 
-    # Eliminar el token (un solo uso)
     cache.delete(f'login_token_{token}')
 
-    # Buscar el usuario en este schema
     try:
         usuario = User.objects.get(id=datos['user_id'])
     except User.DoesNotExist:
-        messages.error(request, 'Usuario no encontrado en este taller.')
+        messages.error(request, 'Usuario no encontrado.')
         return redirect('login_publico')
 
-    # Login sin password (ya fue verificado en el schema publico)
+    # ── VERIFICACION CRITICA otra vez, aqui dentro del schema del tenant ──
+    from taller.models import PerfilUsuario
+    if not PerfilUsuario.objects.filter(usuario=usuario, activo=True).exists():
+        messages.error(request, 'No tienes acceso a este taller.')
+        return redirect('login_publico')
+
     usuario.backend = 'django.contrib.auth.backends.ModelBackend'
     auth_login(request, usuario)
 
     messages.success(request, f'Bienvenido, {usuario.first_name or usuario.username}!')
     return redirect('dashboard')
-
 
 # ─── LANDING ──────────────────────────────────────────────────────────────────
 
