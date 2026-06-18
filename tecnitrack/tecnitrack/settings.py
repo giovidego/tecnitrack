@@ -17,16 +17,17 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.localhost'
 SHARED_APPS = [
     'django_tenants',
     'tenants',
+    
+]
+
+TENANT_APPS = [
+    'taller',
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-]
-
-TENANT_APPS = [
-    'taller',
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [
