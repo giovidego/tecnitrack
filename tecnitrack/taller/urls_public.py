@@ -12,7 +12,7 @@ urlpatterns = [
     # Registro SaaS y onboarding
     path('registro/', onb.registro_taller, name='registro_taller'),
     path('registro/enviado/<str:email>/', onb.registro_confirmacion_enviada, name='registro_confirmacion_enviada'),
-    path('registro/confirmar/<uuid:token>/', onb.confirmar_email, name='confirmar_email'),
+    path('registro/confirmar/<str:token>/', onb.confirmar_email, name='confirmar_email'),
     path('registro/configurar/<int:paso>/', onb.onboarding_wizard, name='onboarding_wizard'),
     path('registro/listo/', onb.onboarding_completado, name='onboarding_completado'),
 
