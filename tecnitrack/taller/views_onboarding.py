@@ -182,9 +182,10 @@ def registro_taller(request):
     form = RegistroTallerForm(request.POST or None, initial={'plan_elegido': plan_inicial})
 
     if request.method == 'POST' and form.is_valid():
-        # Limpiar sesion previa y guardar datos del paso 1
-        request.session.flush()
-        request.session['onboarding_data'] = {
+        # Generar un token unico para este registro
+        token = secrets.token_urlsafe(24)
+
+        datos_registro = {
             'nombre_taller': form.cleaned_data['nombre_taller'],
             'nombre_dueno':  form.cleaned_data['nombre_dueno'],
             'email':         form.cleaned_data['email'],
@@ -192,13 +193,15 @@ def registro_taller(request):
             'ciudad':        form.cleaned_data.get('ciudad', ''),
             'plan_elegido':  form.cleaned_data['plan_elegido'],
         }
-        request.session.modified = True
+
+        # Guardar en CACHE (no en sesion) asociado al token, valido 24 horas
+        cache.set(f'registro_pendiente_{token}', datos_registro, timeout=86400)
 
         email = form.cleaned_data['email']
         _enviar_email_simple(
             email,
             'Confirma tu registro en TecniTrack',
-            f'Continua tu registro aqui:\n{settings.SITE_URL}/registro/configurar/2/'
+            f'Continua tu registro aqui:\n{settings.SITE_URL}/registro/confirmar/{token}/'
         )
         return redirect('registro_confirmacion_enviada', email=email)
 
@@ -206,14 +209,32 @@ def registro_taller(request):
         'form': form, 'plan_inicial': plan_inicial, 'planes': settings.PLANES
     })
 
-
 def registro_confirmacion_enviada(request, email):
     return render(request, 'onboarding/confirmacion_enviada.html', {'email': email})
 
 
 def confirmar_email(request, token):
+    """
+    Recupera los datos del registro desde la cache usando el token del email
+    (no depende de la sesion del navegador que hizo el registro original).
+    """
+    datos = cache.get(f'registro_pendiente_{token}')
+
+    if not datos:
+        messages.error(request, 'El link de confirmacion expiro o ya fue usado. Registrate nuevamente.')
+        return redirect('registro_taller')
+
+    # Transferir los datos de la CACHE a la SESION de quien abre el link.
+    # A partir de aqui el wizard funciona igual que antes.
+    request.session['onboarding_data'] = datos
+    request.session.modified = True
+
+    # Eliminar de la cache (un solo uso del link de confirmacion)
+    cache.delete(f'registro_pendiente_{token}')
+
     messages.success(request, 'Email confirmado. Configura tu cuenta.')
     return redirect('onboarding_wizard', paso=2)
+
 
 
 # ─── WIZARD — PASO 2 ─────────────────────────────────────────────────────────
