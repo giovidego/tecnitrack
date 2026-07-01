@@ -118,35 +118,6 @@
           </td>
       </tr>
       {% endfor %}
-        <!-- {% for orden in ordenes_recientes %}
-        <tr class="
-                  list-group-item-{{ orden.estado }}
-                  {% if orden.prioridad == 'urgente' %}priority-urgente{% elif orden.prioridad == 'alta' %}priority-alta{% endif %}
-                  " >
-          <td><a href="{% url 'detalle_orden' orden.pk %}" class="fw-semibold text-decoration-none text-primary">{{ orden.numero }}</a></td>
-          <td>
-            <a href="{% url 'detalle_cliente' orden.cliente.pk %}" class="text-decoration-none text-dark">
-              {{ orden.cliente.nombre_completo }}
-            </a>
-          </td>
-          <td class="text-muted small">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</td>
-          <td>
-            <span class="badge badge-{{ orden.estado }}">{{ orden.get_estado_display }}</span>
-          </td>
-          <td>
-            <span class="badge bg-{{ orden.get_prioridad_clase }}">{{ orden.get_prioridad_display }}</span>
-          </td>
-          <td class="small text-muted">{{ orden.tecnico.get_full_name|default:"—" }}</td>
-          <td class="small text-muted">{{ orden.dias_en_taller }}d</td>
-          <td>
-            <a href="{% url 'detalle_orden' orden.pk %}" class="btn btn-xs btn-outline-primary btn-sm py-0 px-2">
-              <i class="bi bi-arrow-right"></i>
-            </a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="8" class="text-center text-muted py-4">No hay órdenes aún. <a href="{% url 'crear_orden' %}">Crear la primera</a></td></tr>
-        {% endfor %} -->
       </tbody>
     </table>
   </div>

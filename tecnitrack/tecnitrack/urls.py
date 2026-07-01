@@ -1,5 +1,5 @@
 """
-TecniTrack - URLs privadas por tenant (dashboard, ordenes, clientes, tienda)
+OrdenTec - URLs privadas por tenant (dashboard, ordenes, clientes, tienda)
 django-tenants las enruta segun el schema activo del request.
 """
 from django.urls import path, include

@@ -1,5 +1,5 @@
 """
-TecniTrack - SuscripcionMiddleware
+OrdenTec - SuscripcionMiddleware
 Verifica que el tenant tenga suscripcion activa.
 Con schema-based tenancy, la Suscripcion vive en el schema del taller.
 """

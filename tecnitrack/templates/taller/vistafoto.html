@@ -1,0 +1,129 @@
+{% extends "taller/base.html" %}
+{% block title %}Órdenes{% endblock %}
+{% block page_title %}Órdenes de Trabajo{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'crear_orden' %}" class="btn btn-primary btn-sm">
+  <i class="bi bi-plus-lg me-1"></i> Nueva Orden
+</a>
+{% endblock %}
+
+{% block content %}
+<style>
+  /* Pequeña animación al pasar el ratón por la tarjeta */
+  .order-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .order-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  }
+</style>
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-primary">{{ stats.total_activas }}</div>
+      <div class="stat-label">Órdenes activas</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-success">{{ stats.listas_retirar }}</div>
+      <div class="stat-label">Listas para retirar</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-info">{{ stats.recibidas_hoy }}</div>
+      <div class="stat-label">Ingresadas hoy</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number {% if stats.urgentes > 0 %}text-danger{% else %}text-secondary{% endif %}">{{ stats.urgentes }}</div>
+      <div class="stat-label">Urgentes</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  
+
+  {% for orden in ordenes_recientes %}
+
+  <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+    
+    <div class="card h-100 shadow-sm border-0 order-card
+                list-group-item-{{ orden.estado }}
+                {% if orden.prioridad == 'urgente' %}priority-urgente{% elif orden.prioridad == 'alta' %}priority-alta{% endif %}"
+         style="cursor: pointer; border-radius: 12px; overflow: hidden;"
+         onclick="window.location='{% url 'detalle_orden' orden.pk %}'">
+      
+      <!-- Contenedor de la Foto -->
+      <div class="position-relative" style="height: 180px; background-color: #f8f9fa; border-bottom: 1px solid #eee;">
+        
+        {% if orden.equipo.foto %}
+          <!-- IMAGEN REAL: Cambia 'orden.foto' por el nombre real de tu campo ImagenField -->
+          <img src="{{ orden.equipo.foto.url }}" class="w-100 h-100" alt="Foto equipo">
+        {% else %}
+          <!-- PLACEHOLDER SI NO HAY FOTO -->
+          <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+            <i class="bi bi-image fs-1 opacity-50"></i>
+          </div>
+        {% endif %}
+        
+        <!-- Badges superpuestos en la esquina superior derecha -->
+        <div class="position-absolute top-2 end-2 d-flex gap-1">
+          <span class="badge bg-{{ orden.get_prioridad_clase }} shadow-sm">
+            {{ orden.get_prioridad_display }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Cuerpo de la tarjeta -->
+      <div class="card-body pb-2 pt-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <a href="{% url 'detalle_orden' orden.pk %}" 
+             class="fw-bold text-primary text-decoration-none fs-5"
+             onclick="event.stopPropagation();">
+            {{ orden.numero }}
+          </a>
+          <span class="badge badge-{{ orden.estado }}">
+            {{ orden.get_estado_display }}
+          </span>
+        </div>
+
+        <p class="mb-1 text-dark small fw-semibold mb-2">
+          <i class="bi bi-person-fill me-1 text-muted"></i>{{ orden.cliente.nombre_completo }}
+        </p>
+        
+        <p class="mb-0 text-muted small">
+          <i class="bi bi-laptop me-1"></i>{{ orden.equipo.marca }} {{ orden.equipo.modelo }}
+        </p>
+      </div>
+
+      <!-- Pie de la tarjeta -->
+      <div class="card-footer bg-transparent border-top-0 pt-0 pb-3 px-3 d-flex justify-content-between align-items-center">
+        <span class="text-muted small">
+          <i class="bi bi-wrench me-1"></i>{{ orden.tecnico.get_full_name|default:"—" }}
+        </span>
+        <span class="fw-semibold text-dark small">
+          <i class="bi bi-clock-history me-1"></i>{{ orden.dias_en_taller }}d
+        </span>
+      </div>
+
+    </div>
+  </div>
+  {% empty %}
+    <div class="col-12">
+      <div class="alert alert-light text-center border">
+        <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+        No hay órdenes registradas en este momento.
+      </div>
+    </div>
+  {% endfor %}
+  
+</div>
+
+{% endblock %}

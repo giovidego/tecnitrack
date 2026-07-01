@@ -1,5 +1,5 @@
 """
-TecniTrack - Views de Suscripcion (schema-based tenancy)
+OrdenTec - Views de Suscripcion (schema-based tenancy)
 """
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required

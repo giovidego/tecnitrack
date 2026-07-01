@@ -1,4 +1,4 @@
-¡Bienvenido a TecniTrack, {{ usuario.first_name }}!
+¡Bienvenido a OrdenTec, {{ usuario.first_name }}!
 ==============================================
 
 Tu taller {{ taller.nombre }} está listo.
@@ -18,4 +18,4 @@ Ir a tu panel:
 ¿Tienes preguntas? Responde este email.
 
 --
-TecniTrack · Software para talleres de reparación
+OrdenTec · Software para talleres de reparación

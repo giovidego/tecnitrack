@@ -1,5 +1,5 @@
 """
-TecniTrack - Context processors
+OrdenTec - Context processors
 Expone info del tenant activo en todos los templates.
 """
 from django.db import connection

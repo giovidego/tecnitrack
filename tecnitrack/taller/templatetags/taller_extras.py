@@ -1,5 +1,5 @@
 """
-TecniTrack - Filtros de template personalizados
+OrdenTec - Filtros de template personalizados
 Uso: {% load taller_extras %} en cualquier template
 """
 from django import template

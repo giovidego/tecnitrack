@@ -1,5 +1,7 @@
 """
-TecniTrack - PerfilMiddleware
+OrdenTec - PerfilMiddleware
+Con django-tenants el schema ya aísla los datos.
+Este middleware agrega el perfil y rol del usuario al request.
 Bloquea el acceso si el usuario autenticado no pertenece a este taller.
 """
 from django.db import connection

@@ -1,5 +1,5 @@
 """
-TecniTrack - Forms de Onboarding (schema-based tenancy)
+OrdenTec - Forms de Onboarding (schema-based tenancy)
 """
 from django import forms
 from django.contrib.auth.models import User

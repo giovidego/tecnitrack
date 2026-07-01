@@ -1,13 +1,14 @@
 """
-TecniTrack - Settings con django-tenants (schema-based multi-tenancy)
+OrdenTec - Settings con django-tenants (schema-based multi-tenancy)
 Requiere PostgreSQL.
 """
 import os
 from pathlib import Path
-
+from dotenv import load_dotenv
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR.parent / '.env')
 
 SECRET_KEY    = os.environ.get('SECRET_KEY', 'django-insecure-cambiar-en-produccion')
 DEBUG         = os.environ.get('DEBUG', 'True') == 'True'
@@ -79,7 +80,7 @@ DATABASES = {
         'ENGINE':   'django_tenants.postgresql_backend',
         'NAME':     os.environ.get('DB_NAME',     'tecnitrack'),
         'USER':     os.environ.get('DB_USER',     'tecnitrack_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'dev_password_123'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'devpasswd123'),
         'HOST':     os.environ.get('DB_HOST',     'localhost'),
         'PORT':     os.environ.get('DB_PORT',     '5432'),
     }
@@ -112,7 +113,23 @@ MEDIA_ROOT       = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND      = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'TecniTrack <noreply@tecnitrack.cl>'
+
+# ── EMAIL ──────────────────────────────────────────────────────────────────
+if os.environ.get('EMAIL_HOST'):
+    # Producción / pruebas reales con Gmail SMTP
+    EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST          = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT          = int(os.environ.get('EMAIL_PORT', 587))
+    EMAIL_USE_TLS       = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_HOST_USER     = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+    DEFAULT_FROM_EMAIL  = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+else:
+    # Desarrollo local sin credenciales: imprime el email en la consola
+    EMAIL_BACKEND      = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'OrdenTec <noreply@OrdenTec.com>'
+
+
 
 SITE_URL = os.environ.get('SITE_URL', 'http://localhost:8000')
 

@@ -1,5 +1,5 @@
 """
-TecniTrack - Modelos del taller (schema privado por tenant)
+OrdenTec - Modelos del taller (schema privado por tenant)
 Con django-tenants cada taller tiene su propio schema de PostgreSQL.
 NO necesitan FK a Taller — el aislamiento lo garantiza el schema.
 """

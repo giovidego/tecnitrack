@@ -1,5 +1,5 @@
 """
-TecniTrack - Admin del schema privado del taller
+OrdenTec - Admin del schema privado del taller
 """
 from django.contrib import admin
 from .models import (

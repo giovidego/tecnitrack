@@ -1,6 +1,6 @@
 """
-TecniTrack - URLs del schema público
-Estas rutas responden cuando el dominio es el raíz (tecnitrack.cl)
+OrdenTec - URLs del schema público
+Estas rutas responden cuando el dominio es el raíz (OrdenTec.com)
 o cuando se accede desde el schema 'public'.
 Incluye: landing, registro de talleres, confirmación email, seguimiento público.
 """

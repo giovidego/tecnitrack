@@ -1,0 +1,332 @@
+{% extends "taller/base.html" %}
+{% block title %}Guía de uso{% endblock %}
+{% block page_title %}Guía de uso de OrdenTec{% endblock %}
+
+{% block content %}
+<style>
+  .guia-hero {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+  }
+  .guia-nav {
+    position: sticky;
+    top: 1rem;
+  }
+  .guia-nav .nav-link {
+    color: #6b7280;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.25rem;
+  }
+  .guia-nav .nav-link:hover,
+  .guia-nav .nav-link.active {
+    background: #eef2ff;
+    color: #4f46e5;
+    font-weight: 600;
+  }
+  .guia-section {
+    background: white;
+    border-radius: 14px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    scroll-margin-top: 1rem;
+  }
+  .guia-section h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+  .guia-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1.1rem; flex-shrink: 0;
+  }
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: step;
+  }
+  .step-list li {
+    counter-increment: step;
+    position: relative;
+    padding: 0.6rem 0 0.6rem 2.5rem;
+    color: #374151;
+    font-size: 0.92rem;
+  }
+  .step-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 0.5rem;
+    width: 24px; height: 24px;
+    background: #eef2ff;
+    color: #4f46e5;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.78rem; font-weight: 700;
+  }
+  .estado-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin: 0.2rem;
+  }
+  .faq-item {
+    border-bottom: 1px solid #f1f3f5;
+    padding: 1rem 0;
+  }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.4rem;
+  }
+  .tip-box {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font-size: 0.88rem;
+    color: #78350f;
+    margin-top: 0.75rem;
+  }
+</style>
+
+<div class="guia-hero">
+  <h3 class="fw-bold mb-2"><i class="bi bi-book me-2"></i>Bienvenido a la guía de OrdenTec</h3>
+  <p class="mb-0 opacity-90">
+    Todo lo que necesitas saber para gestionar tu taller, desde recibir un equipo hasta entregarlo,
+    sin perder ninguna llamada de cliente preguntando por el estado.
+  </p>
+</div>
+
+<div class="row">
+  <!-- Navegación lateral de la guía -->
+  <div class="col-md-3 d-none d-md-block">
+    <nav class="guia-nav nav flex-column">
+      <a class="nav-link" href="#primeros-pasos">1. Primeros pasos</a>
+      <a class="nav-link" href="#clientes-equipos">2. Clientes y equipos</a>
+      <a class="nav-link" href="#ordenes">3. Crear una orden</a>
+      <a class="nav-link" href="#estados">4. Estados de reparación</a>
+      <a class="nav-link" href="#seguimiento">5. Seguimiento del cliente</a>
+      <a class="nav-link" href="#tecnicos">6. Invitar técnicos</a>
+      <a class="nav-link" href="#tienda">7. Tienda virtual</a>
+      <a class="nav-link" href="#suscripcion">8. Tu suscripción</a>
+      <a class="nav-link" href="#preguntas">9. Preguntas frecuentes</a>
+    </nav>
+  </div>
+
+  <!-- Contenido de la guía -->
+  <div class="col-md-9">
+
+    <!-- 1. Primeros pasos -->
+    <div class="guia-section" id="primeros-pasos">
+      <h4>
+        <div class="guia-icon" style="background:#4f46e5;"><i class="bi bi-flag"></i></div>
+        Primeros pasos
+      </h4>
+      <p class="text-muted mb-3">El flujo básico de OrdenTec tiene 4 etapas que se repiten cada vez que llega un equipo:</p>
+      <ol class="step-list">
+        <li>Registrar al <strong>cliente</strong> (si es nuevo) con su nombre y teléfono.</li>
+        <li>Registrar el <strong>equipo</strong> que trae (notebook, PC, tablet, etc.).</li>
+        <li>Crear la <strong>orden de reparación</strong> describiendo el problema.</li>
+        <li>Ir cambiando el <strong>estado</strong> de la orden — el cliente se entera automáticamente por email.</li>
+      </ol>
+      <div class="tip-box">
+        <i class="bi bi-lightbulb me-1"></i>
+        <strong>Tip:</strong> no necesitas hacer estos 3 pasos por separado. Al crear una orden nueva, puedes
+        registrar el cliente y el equipo sin salir del formulario.
+      </div>
+    </div>
+
+    <!-- 2. Clientes y equipos -->
+    <div class="guia-section" id="clientes-equipos">
+      <h4>
+        <div class="guia-icon" style="background:#0ea5e9;"><i class="bi bi-people"></i></div>
+        Clientes y equipos
+      </h4>
+      <p class="text-muted mb-2">
+        Cada <strong>cliente</strong> puede tener varios <strong>equipos</strong> asociados (por ejemplo, si trae su notebook
+        y también una impresora). La ficha del cliente guarda:
+      </p>
+      <ul>
+        <li>Nombre, RUT, teléfono y email (el email es importante: ahí llegan las notificaciones).</li>
+        <li>Historial completo de todas las órdenes que ha tenido, pasadas y activas.</li>
+        <li>Todos los equipos que ha traído alguna vez al taller.</li>
+      </ul>
+      <div class="tip-box">
+        <i class="bi bi-lightbulb me-1"></i>
+        Si el cliente no tiene email, el sistema funciona igual, pero no podrá recibir las notificaciones
+        automáticas de estado. Tendrás que avisarle manualmente.
+      </div>
+    </div>
+
+    <!-- 3. Crear una orden -->
+    <div class="guia-section" id="ordenes">
+      <h4>
+        <div class="guia-icon" style="background:#10b981;"><i class="bi bi-clipboard-check"></i></div>
+        Crear una orden de reparación
+      </h4>
+      <p class="text-muted mb-2">Al crear una orden nueva, el sistema le asigna automáticamente:</p>
+      <ul>
+        <li>Un <strong>número correlativo</strong> único (ej: <code>TK-2025-0042</code>) que sirve como comprobante.</li>
+        <li>Un <strong>link de seguimiento</strong> privado que solo conoce ese cliente.</li>
+        <li>El estado inicial <strong>"Recibido"</strong>.</li>
+      </ul>
+      <p class="text-muted mb-0">
+        Tú completas: quién trae el equipo, qué problema reporta, qué accesorios trajo (cargador, mouse, etc.),
+        la prioridad y opcionalmente a qué técnico se la asignas.
+      </p>
+    </div>
+
+    <!-- 4. Estados -->
+    <div class="guia-section" id="estados">
+      <h4>
+        <div class="guia-icon" style="background:#f59e0b;"><i class="bi bi-arrow-repeat"></i></div>
+        Estados de una reparación
+      </h4>
+      <p class="text-muted mb-3">Cada orden pasa por estos estados. Cada vez que cambias uno, el cliente recibe un email automático:</p>
+      <div class="d-flex flex-wrap">
+        <span class="estado-badge" style="background:#f1f5f9;color:#475569;"><i class="bi bi-inbox"></i> Recibido</span>
+        <span class="estado-badge" style="background:#e0f2fe;color:#0369a1;"><i class="bi bi-search"></i> En diagnóstico</span>
+        <span class="estado-badge" style="background:#fef3c7;color:#92400e;"><i class="bi bi-hourglass-split"></i> Esperando repuestos</span>
+        <span class="estado-badge" style="background:#dbeafe;color:#1e40af;"><i class="bi bi-tools"></i> En reparación</span>
+        <span class="estado-badge" style="background:#dcfce7;color:#166534;"><i class="bi bi-check-circle"></i> Listo para retirar</span>
+        <span class="estado-badge" style="background:#1f2937;color:white;"><i class="bi bi-box-arrow-right"></i> Entregado</span>
+        <span class="estado-badge" style="background:#fee2e2;color:#991b1b;"><i class="bi bi-x-circle"></i> Cancelado</span>
+      </div>
+      <div class="tip-box mt-3">
+        <i class="bi bi-lightbulb me-1"></i>
+        No es obligatorio pasar por todos los estados en orden. Si el diagnóstico fue inmediato, puedes saltar
+        directo de "Recibido" a "En reparación".
+      </div>
+    </div>
+
+    <!-- 5. Seguimiento -->
+    <div class="guia-section" id="seguimiento">
+      <h4>
+        <div class="guia-icon" style="background:#8b5cf6;"><i class="bi bi-link-45deg"></i></div>
+        Cómo ve el cliente el seguimiento
+      </h4>
+      <p class="text-muted mb-2">
+        Cada orden tiene un link único (algo como <code>OrdenTec.com/seguimiento/a1b2c3.../</code>) que puedes
+        copiar y enviar por WhatsApp si el email falla. El cliente:
+      </p>
+      <ul>
+        <li><strong>No necesita crear cuenta</strong> ni recordar contraseñas.</li>
+        <li>Ve el estado actual y todo el historial de cambios.</li>
+        <li>Puede volver a entrar al link cuantas veces quiera.</li>
+      </ul>
+    </div>
+
+    <!-- 6. Técnicos -->
+    <div class="guia-section" id="tecnicos">
+      <h4>
+        <div class="guia-icon" style="background:#ec4899;"><i class="bi bi-person-plus"></i></div>
+        Invitar técnicos a tu equipo
+      </h4>
+      <ol class="step-list">
+        <li>Ve a <strong>Equipo → Invitar técnico</strong> en el menú lateral.</li>
+        <li>Escribe el email del técnico y elige su rol (técnico o administrador).</li>
+        <li>El técnico recibe un email con un link para crear su propia cuenta.</li>
+        <li>Una vez que acepta, puedes asignarle órdenes desde el formulario de creación.</li>
+      </ol>
+      <div class="tip-box">
+        <i class="bi bi-lightbulb me-1"></i>
+        Si el email no llega, copia el link manualmente desde la tabla de invitaciones — hay un botón
+        para copiarlo al portapapeles.
+      </div>
+    </div>
+
+    <!-- 7. Tienda virtual -->
+    <div class="guia-section" id="tienda">
+      <h4>
+        <div class="guia-icon" style="background:#06b6d4;"><i class="bi bi-shop"></i></div>
+        Tienda virtual (opcional)
+      </h4>
+      <p class="text-muted mb-2">
+        Si tu plan incluye el módulo de tienda, puedes publicar una vitrina pública con:
+      </p>
+      <ul>
+        <li><strong>Repuestos y accesorios</strong> — cables, cargadores, RAM, discos.</li>
+        <li><strong>Servicios a precio fijo</strong> — limpieza, instalación de software, recuperación de datos.</li>
+        <li><strong>Equipos reacondicionados</strong> — que tengas en stock para vender.</li>
+      </ul>
+      <p class="text-muted mb-0">
+        Los clientes pueden ver tu vitrina sin necesidad de cuenta y enviarte una consulta sobre cualquier producto.
+      </p>
+    </div>
+
+    <!-- 8. Suscripción -->
+    <div class="guia-section" id="suscripcion">
+      <h4>
+        <div class="guia-icon" style="background:#64748b;"><i class="bi bi-credit-card"></i></div>
+        Tu suscripción y período de prueba
+      </h4>
+      <p class="text-muted mb-0">
+        Tienes 30 días de prueba gratuita desde que creaste tu cuenta. Puedes ver cuántos días te quedan
+        y comparar planes en la sección <strong>Suscripción</strong> del menú. Si necesitas más técnicos o más
+        órdenes mensuales, puedes cambiar de plan en cualquier momento.
+      </p>
+    </div>
+
+    <!-- 9. FAQ -->
+    <div class="guia-section" id="preguntas">
+      <h4>
+        <div class="guia-icon" style="background:#475569;"><i class="bi bi-question-circle"></i></div>
+        Preguntas frecuentes
+      </h4>
+
+      <div class="faq-item">
+        <div class="faq-q">¿Qué pasa si me equivoco al crear una orden?</div>
+        <div class="text-muted small">Puedes editar el problema reportado, el diagnóstico y otros campos desde el detalle de la orden en cualquier momento.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿El cliente puede ver mis notas internas?</div>
+        <div class="text-muted small">No. Las "notas internas" solo las ves tú y tu equipo. El cliente solo ve el estado, el historial público y los comentarios que escribes al cambiar de estado.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Puedo usar OrdenTec desde el celular?</div>
+        <div class="text-muted small">Sí, funciona en cualquier navegador de celular sin instalar nada.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Qué pasa si se vence mi período de prueba?</div>
+        <div class="text-muted small">Tus datos no se borran. El sistema te pedirá elegir un plan para seguir usando el panel normalmente.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Resaltar la sección activa en el menú lateral al hacer scroll
+document.addEventListener('DOMContentLoaded', function() {
+  const sections = document.querySelectorAll('.guia-section');
+  const navLinks = document.querySelectorAll('.guia-nav .nav-link');
+
+  function onScroll() {
+    let current = '';
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 120) current = section.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+});
+</script>
+{% endblock %}

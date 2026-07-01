@@ -12,6 +12,7 @@ urlpatterns = [
     # Dashboard
     path('',          views.dashboard, name='dashboard'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboardfoto', views.dashboard_foto, name='dashboardfoto'),
 
     # Clientes
     path('clientes/',                      views.lista_clientes,  name='lista_clientes'),
@@ -36,6 +37,8 @@ urlpatterns = [
     # Suscripcion
     path('suscripcion/vencida/', sus.suscripcion_vencida, name='suscripcion_vencida'),
     path('planes/',              sus.ver_planes,           name='ver_planes'),
+
+    path('guia/', views.guia_uso, name='guia_uso'),
 
     # Seguimiento publico (tambien accesible desde schema del taller)
     path('seguimiento/<uuid:token>/', views.seguimiento_orden, name='seguimiento_orden'),

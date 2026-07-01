@@ -10,6 +10,34 @@
 {% endblock %}
 
 {% block content %}
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-primary">{{ stats.total_activas }}</div>
+      <div class="stat-label">Órdenes activas</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-success">{{ stats.listas_retirar }}</div>
+      <div class="stat-label">Listas para retirar</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number text-info">{{ stats.recibidas_hoy }}</div>
+      <div class="stat-label">Ingresadas hoy</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-number {% if stats.urgentes > 0 %}text-danger{% else %}text-secondary{% endif %}">{{ stats.urgentes }}</div>
+      <div class="stat-label">Urgentes</div>
+    </div>
+  </div>
+</div>
+
 <!-- Filtros por estado -->
 <div class="d-flex gap-2 mb-3 flex-wrap">
   <a href="{% url 'lista_ordenes' %}{% if q %}?q={{ q }}{% endif %}" 

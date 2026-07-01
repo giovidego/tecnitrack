@@ -19,4 +19,4 @@ Contacto:
 {% endif %}{% if taller.direccion %}Dirección: {{ taller.direccion }}
 {% endif %}
 --
-Este correo fue enviado automáticamente por TecniTrack.
+Este correo fue enviado automáticamente por OrdenTec.

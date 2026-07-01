@@ -1,5 +1,5 @@
 """
-TecniTrack - Notificaciones automaticas (schema-based tenancy)
+OrdenTec - Notificaciones automaticas (schema-based tenancy)
 El taller activo se obtiene de connection.tenant en vez de orden.taller
 """
 from django.core.mail import send_mail

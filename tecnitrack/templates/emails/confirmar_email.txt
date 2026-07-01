@@ -1,16 +1,16 @@
-TecniTrack — Confirma tu email
+OrdenTec — Confirma tu email
 ==============================
 
 Hola {{ registro.nombre_dueno }},
 
-Gracias por registrar {{ registro.nombre_taller }} en TecniTrack.
+Gracias por registrar {{ registro.nombre_taller }} en OrdenTec.
 
 Confirma tu email haciendo click en este link:
 {{ url_confirmacion }}
 
 Este link expira en 48 horas.
 
-Si no te registraste en TecniTrack, ignora este mensaje.
+Si no te registraste en OrdenTec, ignora este mensaje.
 
 --
-TecniTrack · Software para talleres de reparación
+OrdenTec · Software para talleres de reparación

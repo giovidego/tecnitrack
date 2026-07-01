@@ -1,5 +1,5 @@
 """
-TecniTrack - Views del taller (schema privado del tenant)
+OrdenTec - Views del taller (schema privado del tenant)
 Sin referencias a Taller FK - el schema ya aísla los datos.
 connection.tenant da acceso al objeto Taller activo cuando se necesita.
 """
@@ -12,6 +12,7 @@ from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db import connection
+from django.conf import settings
 
 from .models import (
     Cliente, Equipo, OrdenReparacion, HistorialEstado,
@@ -50,13 +51,57 @@ def login_view(request):
     return render(request, 'taller/login.html', {'form': form})
 
 
+# def logout_view(request):
+#     logout(request)
+#     return redirect('login')
 def logout_view(request):
+    """
+    Cierra sesion y redirige siempre a la landing publica,
+    sin importar desde que subdominio (taller) se cerro sesion.
+    """
     logout(request)
-    return redirect('login')
 
+    scheme = 'https' if not settings.DEBUG else 'http'
+    port   = request.get_port()
+    host   = 'localhost' if settings.DEBUG else 'OrdenTec.com'
+
+    if (scheme == 'http'  and port == '80') or \
+       (scheme == 'https' and port == '443'):
+        url = f"{scheme}://{host}/"
+    else:
+        url = f"{scheme}://{host}:{port}/"
+
+    return redirect(url)
 
 @login_required
 def dashboard(request):
+    taller = _get_tenant()
+    rol    = _get_rol(request)
+
+    if not taller:
+        return render(request, 'taller/sin_taller.html')
+    
+    ordenes = OrdenReparacion.objects.all()
+    hoy     = timezone.now().date()
+
+    stats = {
+        'total_activas':    ordenes.exclude(estado__in=['entregado', 'cancelado']).count(),
+        'recibidas_hoy':    ordenes.filter(fecha_ingreso__date=hoy).count(),
+        'listas_retirar':   ordenes.filter(estado='listo').count(),
+        'urgentes':         ordenes.filter(prioridad='urgente').exclude(estado__in=['entregado', 'cancelado']).count(),
+        'total_clientes':   Cliente.objects.count(),
+        'total_ordenes':    ordenes.count(),
+    }
+
+    ordenes_recientes = ordenes.select_related('cliente', 'equipo', 'tecnico')[:10]
+
+    return render(request, 'taller/dashboard.html', {
+        'taller': taller, 'rol': rol,
+        'stats': stats, 'ordenes_recientes': ordenes_recientes,
+    })
+
+@login_required
+def dashboard_foto(request):
     taller = _get_tenant()
     rol    = _get_rol(request)
 
@@ -77,11 +122,10 @@ def dashboard(request):
 
     ordenes_recientes = ordenes.select_related('cliente', 'equipo', 'tecnico')[:10]
 
-    return render(request, 'taller/dashboard.html', {
+    return render(request, 'taller/vistafoto.html', {
         'taller': taller, 'rol': rol,
         'stats': stats, 'ordenes_recientes': ordenes_recientes,
     })
-
 
 # ── CLIENTES ──────────────────────────────────────────────────────────────────
 
@@ -181,7 +225,18 @@ def lista_ordenes(request):
         e: OrdenReparacion.objects.filter(estado=e).count()
         for e, _ in OrdenReparacion.ESTADO_CHOICES
     }
+    hoy     = timezone.now().date()
+    stats = {
+        'total_activas':    ordenes.exclude(estado__in=['entregado', 'cancelado']).count(),
+        'recibidas_hoy':    ordenes.filter(fecha_ingreso__date=hoy).count(),
+        'listas_retirar':   ordenes.filter(estado='listo').count(),
+        'urgentes':         ordenes.filter(prioridad='urgente').exclude(estado__in=['entregado', 'cancelado']).count(),
+        'total_clientes':   Cliente.objects.count(),
+        'total_ordenes':    ordenes.count(),
+    }
+    
     return render(request, 'taller/ordenes/lista.html', {
+        'stats':stats,
         'ordenes': ordenes, 'estado_filtro': estado, 'q': q,
         'estados': OrdenReparacion.ESTADO_CHOICES,
         'estados_count': estados_count,
@@ -286,7 +341,16 @@ def eliminar_repuesto(request, pk, repuesto_id):
     messages.success(request, 'Repuesto eliminado.')
     return redirect('detalle_orden', pk=pk)
 
-
+@login_required
+def guia_uso(request):
+    """
+    Pagina de ayuda fija dentro del panel del taller.
+    Explica el flujo completo de uso del sistema.
+    """
+    return render(request, 'taller/guia.html', {
+        'taller': _get_tenant(),
+        'rol':    _get_rol(request),
+    })
 # ── SEGUIMIENTO PÚBLICO ───────────────────────────────────────────────────────
 
 def seguimiento_orden(request, token):

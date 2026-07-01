@@ -1,5 +1,5 @@
 """
-TecniTrack - Modelos de Onboarding y Suscripción
+OrdenTec - Modelos de Onboarding y Suscripción
 Añadir a taller/models.py o importar desde aquí
 """
 import uuid

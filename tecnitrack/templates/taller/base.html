@@ -1,9 +1,10 @@
+{%load static%}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}TecniTrack{% endblock %} - {% if taller_actual %}{{ taller_actual.nombre }}{% else %}TecniTrack{% endif %}</title>
+  <title>{% block title %}OrdenTec{% endblock %} - {% if taller_actual %}{{ taller_actual.nombre }}{% else %}OrdenTec{% endif %}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <style>
@@ -15,7 +16,33 @@
       --sidebar-text: rgba(255,255,255,0.75);
       --sidebar-active: rgba(255,255,255,0.12);
     }
-    body { background: #f8f7ff; font-family: 'Segoe UI', system-ui, sans-serif; }
+    /* 1. Quitamos márgenes y configuramos el alto mínimo */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            
+            /* 2. Llamamos al GIF usando la etiqueta de Django */
+            background-image: url("{% static 'images/ezgif.gif' %}");
+            
+            /* 3. La magia del CSS para que se vea perfecto */
+            background-size: cover;       /* Hace que el GIF cubra todo el ancho y alto */
+            background-position: center;  /* Lo centra si es más grande que la pantalla */
+            background-repeat: no-repeat; /* Evita que se repita como un mosaico */
+            background-attachment: fixed; /* Hace un efecto de "parallax" (el GIF se queda fijo al hacer scroll) */
+        }
+
+        /* 4. Capa oscura semitransparente (OPCIONAL PERO RECOMENDADO) */
+        /* Si tu GIF es muy colorido, el texto no se leerá. Esto pone una capa oscura encima del GIF */
+        
+
+        /* 5. Contenedor de tu contenido */
+        .contenido-principal {
+            position: relative;
+            z-index: 1; /* ¡CLAVE! Esto asegura que tu texto, formularios, etc. estén POR ENCIMA del GIF y de la capa oscura */
+            color: white; /* Cambiamos el texto a blanco para que contraste con el fondo oscuro */
+        }
+    /* body { background: #f8f7ff; font-family: 'Segoe UI', system-ui, sans-serif; } */
     
     /* Sidebar */
     .sidebar {
@@ -139,7 +166,7 @@
   <div class="sidebar-brand">
     <a href="{% url 'dashboard' %}" class="brand-name">
       <div class="brand-icon"><i class="bi bi-tools"></i></div>
-      TecniTrack
+      OrdenTec
     </a>
     {% if taller_actual %}
     <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); margin-top:0.35rem; padding-left:0.25rem;">
@@ -151,8 +178,12 @@
   <nav class="sidebar-nav">
     <div class="sidebar-section">Principal</div>
     <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-      <i class="bi bi-speedometer2"></i> Dashboard
+      <i class="bi bi-speedometer2"></i> Vista general
     </a>
+    <a href="{% url 'dashboardfoto' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboardfoto' %}active{% endif %}">
+      <i class="bi bi-speedometer2"></i> Vista con foto
+    </a>
+    
 
     <div class="sidebar-section">Gestión</div>
     <a href="{% url 'lista_ordenes' %}" class="nav-link {% if 'orden' in request.resolver_match.url_name %}active{% endif %}">
@@ -179,6 +210,12 @@
       <i class="bi bi-person-plus-fill"></i> Planes
     </a>
     {% endif %}
+    <li class="nav-item">
+      <a class="nav-link {% if request.resolver_match.url_name == 'guia_uso' %}active{% endif %}"
+        href="{% url 'guia_uso' %}">
+        <i class="bi bi-question-circle me-2"></i> Guía de uso
+      </a>
+    </li>
   </nav>
 
   <div class="sidebar-footer">
@@ -199,7 +236,7 @@
     <div>
       <i class="bi bi-clock-history text-warning me-1"></i>
       {% if request.session.trial_dias_restantes == 0 %}
-        <strong>Tu período de prueba vence hoy.</strong> Contrata un plan para seguir usando TecniTrack.
+        <strong>Tu período de prueba vence hoy.</strong> Contrata un plan para seguir usando OrdenTec.
       {% else %}
         <strong>Te quedan {{ request.session.trial_dias_restantes }} días de prueba gratis.</strong>
         Después necesitarás un plan para continuar.

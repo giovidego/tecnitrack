@@ -1,5 +1,5 @@
 """
-TecniTrack - App Tenants (schema público)
+OrdenTec - App Tenants (schema público)
 Cada Taller es un tenant con su propio schema de PostgreSQL.
 Este modelo vive en el schema 'public' y es gestionado por django-tenants.
 """
@@ -25,7 +25,7 @@ class Taller(TenantMixin):
     nombre       = models.CharField(max_length=120)
     rut          = models.CharField(max_length=12, blank=True)
     telefono     = models.CharField(max_length=20, blank=True)
-    email        = models.EmailField()
+    email        = models.EmailField(unique=True)
     direccion    = models.CharField(max_length=200, blank=True)
     plan         = models.CharField(max_length=20, choices=PLAN_CHOICES, default='basico')
     activo       = models.BooleanField(default=True)
@@ -57,7 +57,7 @@ class Dominio(DomainMixin):
     """
     Dominio o subdominio asociado a un taller.
     Ejemplos:
-        reparaciones-munoz.tecnitrack.cl  → taller Reparaciones Muñoz
+        reparaciones-munoz.OrdenTec.com  → taller Reparaciones Muñoz
         localhost                         → desarrollo local
 
     django-tenants usa este modelo para rutear cada request

@@ -163,7 +163,15 @@
         {% endfor %}
       </div>
     </div>
-
+        <div class="d-flex align-items-center justify-content-center">
+  {% if orden.equipo.foto %}
+    <img src="{{ orden.equipo.foto.url }}" alt="Foto equipo" style="max-width: 50%; max-height: 400px; object-fit: contain;">
+  {% else %}
+    <div class="text-muted">
+      <i class="bi bi-image fs-1 opacity-50"></i>
+    </div>
+  {% endif %}
+</div>
   </div><!-- /col-lg-8 -->
 
   <!-- Columna derecha: cambio de estado y presupuesto -->
