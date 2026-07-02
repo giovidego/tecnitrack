@@ -152,7 +152,7 @@ def crear_cliente(request):
         cliente = form.save()
         messages.success(request, f'Cliente {cliente.nombre_completo()} registrado.')
         if request.GET.get('next') == 'orden':
-            return redirect('detalle_cliente', pk=cliente.id)
+            return redirect('crear_orden_cliente', cliente_id=cliente.id)
         return redirect('detalle_cliente', pk=cliente.id)
     return render(request, 'taller/clientes/form.html', {
         'form': form, 'titulo': 'Nuevo Cliente', 'taller': _get_tenant()
