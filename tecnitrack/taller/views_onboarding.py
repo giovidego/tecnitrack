@@ -200,7 +200,7 @@ def login_publico(request):
                     f'Expira en 5 minutos. Si no fuiste tu, ignora este correo.'
                 )
             )
-            print(f"DEBUG: llegando al render OTP, mostrar_otp=True, otp_token={otp_token}")
+            
             # 5. NUEVO: re-renderizar el formulario mostrando el campo OTP
             return render(request, 'onboarding/login_publico.html', {
                 'mostrar_otp':  True,
