@@ -94,32 +94,52 @@
 
 {% block extra_js %}
 <script>
-// Carga dinámica de equipos al cambiar cliente
-const selectCliente = document.getElementById('id_cliente');
-const selectEquipo = document.getElementById('id_equipo');
+const selectCliente   = document.getElementById('id_cliente');
+const selectEquipo    = document.getElementById('id_equipo');
 const linkNuevoEquipo = document.getElementById('link-nuevo-equipo');
-const btnNuevoEquipo = document.getElementById('btn-nuevo-equipo');
+const btnNuevoEquipo  = document.getElementById('btn-nuevo-equipo');
 
-selectCliente.addEventListener('change', function() {
-  const clienteId = this.value;
+function cargarEquipos(clienteId, equipoPreseleccionado = null) {
   if (!clienteId) {
     selectEquipo.innerHTML = '<option value="">---------</option>';
-    linkNuevoEquipo.style.display = 'none';
+    if (linkNuevoEquipo) linkNuevoEquipo.style.display = 'none';
     return;
   }
+
   fetch(`/api/clientes/${clienteId}/equipos/`)
     .then(r => r.json())
     .then(data => {
       selectEquipo.innerHTML = '<option value="">---------</option>';
       data.equipos.forEach(eq => {
-        const opt = document.createElement('option');
-        opt.value = eq.id;
+        const opt       = document.createElement('option');
+        opt.value       = eq.id;
         opt.textContent = `${eq.marca} ${eq.modelo || ''} (${eq.tipo})`;
+        // Si viene un equipo preseleccionado (desde ?equipo_id=X), marcarlo
+        if (equipoPreseleccionado && eq.id == equipoPreseleccionado) {
+          opt.selected = true;
+        }
         selectEquipo.appendChild(opt);
       });
-      linkNuevoEquipo.style.display = 'block';
-      btnNuevoEquipo.href = `/clientes/${clienteId}/equipos/nuevo/?next=orden`;
+      if (linkNuevoEquipo) linkNuevoEquipo.style.display = 'block';
+      if (btnNuevoEquipo)  btnNuevoEquipo.href = `/clientes/${clienteId}/equipos/nuevo/?next=orden`;
     });
+}
+
+// Evento manual del usuario
+selectCliente.addEventListener('change', function() {
+  cargarEquipos(this.value);
+});
+
+// ── AUTO-CARGA al entrar con cliente preseleccionado ──────────────────────
+// Cubre el caso: /ordenes/nueva/cliente/<id>/ o ?next=orden tras crear cliente
+document.addEventListener('DOMContentLoaded', function() {
+  const clienteId = selectCliente.value;
+  if (clienteId) {
+    // Leer equipo preseleccionado desde URL si existe (?equipo_id=X)
+    const params    = new URLSearchParams(window.location.search);
+    const equipoId  = params.get('equipo_id');
+    cargarEquipos(clienteId, equipoId);
+  }
 });
 </script>
 {% endblock %}

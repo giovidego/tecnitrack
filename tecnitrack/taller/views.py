@@ -195,14 +195,38 @@ def crear_equipo(request, cliente_id):
         equipo.cliente = cliente
         equipo.save()
         messages.success(request, f'Equipo {equipo} registrado.')
+
+        # Si viene de la orden, redirigir con equipo_id para autoselección
         if request.GET.get('next') == 'orden':
-            return redirect('crear_orden_equipo', equipo_id=equipo.id)
+            return redirect(
+                f'/ordenes/nueva/cliente/{cliente.id}/?equipo_id={equipo.id}'
+            )
         return redirect('detalle_cliente', pk=cliente.id)
+
     return render(request, 'taller/equipos/form.html', {
-        'form': form, 'cliente': cliente,
-        'titulo': f'Nuevo equipo para {cliente.nombre_completo()}',
-        'taller': _get_tenant()
+        'form':    form,
+        'cliente': cliente,
+        'titulo':  f'Nuevo equipo para {cliente.nombre_completo()}',
+        'taller':  _get_tenant(),
     })
+
+# @login_required
+# def crear_equipo(request, cliente_id):
+#     cliente = get_object_or_404(Cliente, pk=cliente_id)
+#     form = EquipoForm(request.POST or None, request.FILES or None)
+#     if request.method == 'POST' and form.is_valid():
+#         equipo = form.save(commit=False)
+#         equipo.cliente = cliente
+#         equipo.save()
+#         messages.success(request, f'Equipo {equipo} registrado.')
+#         if request.GET.get('next') == 'orden':
+#             return redirect('crear_orden_equipo', equipo_id=equipo.id)
+#         return redirect('detalle_cliente', pk=cliente.id)
+#     return render(request, 'taller/equipos/form.html', {
+#         'form': form, 'cliente': cliente,
+#         'titulo': f'Nuevo equipo para {cliente.nombre_completo()}',
+#         'taller': _get_tenant()
+#     })
 
 
 # ── ÓRDENES ───────────────────────────────────────────────────────────────────
